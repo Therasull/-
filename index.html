@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GameAdmin · Портал собеседований</title>
+<title>Arkhangelsk · Портал собеседований</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════════════
@@ -692,6 +692,11 @@ body::after{
 
 <script>
 // ═══════════════════════════════════════════════════
+// SITE DEFAULT STATE (change to true to open by default for all devices)
+// When admin toggles via admin panel on their device, it overrides this
+// for candidates on OTHER devices, set this to true after enabling in admin panel
+const SITE_DEFAULT_ACTIVE = false;
+// ═══════════════════════════════════════════════════
 // THEME
 // ═══════════════════════════════════════════════════
 function toggleTheme(){
@@ -713,7 +718,7 @@ function toggleTheme(){
 const DB={
   _g(k){try{return JSON.parse(localStorage.getItem('gap_'+k));}catch{return null;}},
   _s(k,v){localStorage.setItem('gap_'+k,JSON.stringify(v));},
-  settings(){return this._g('cfg')||{active:false,adminHash:hs('Ark#9mX$vQ2!')};},
+  settings(){return this._g('cfg')||{active:SITE_DEFAULT_ACTIVE,adminHash:hs('Ark#9mX$vQ2!')};},
   saveSettings(v){this._s('cfg',v);},
   tokens(){return this._g('tok')||[];},
   saveTokens(v){this._s('tok',v);},
@@ -798,6 +803,8 @@ function boot(){
     showAdminPanel();
     return;
   }
+  // Restore candidate interview session on reload
+  if(c.active && restoreInterview()) return;
   showScreen(c.active?'screen-login':'screen-offline');
 }
 function goBack(){showScreen(DB.settings().active?'screen-login':'screen-offline');}
@@ -841,11 +848,32 @@ function startLockUI(){
 // ═══════════════════════════════════════════════════
 // INTERVIEW
 // ═══════════════════════════════════════════════════
+function saveInterviewProgress(){
+  if(!S.user)return;
+  sessionStorage.setItem('gap_iv',JSON.stringify({user:S.user,block:S.block,answers:S.answers,timerSec:S.timerSec,timerTotal:S.timerTotal}));
+}
+function clearInterviewProgress(){sessionStorage.removeItem('gap_iv');}
 function startInterview(){
   S.block=0;S.answers={};S.timerSec=45*60;S.timerTotal=45*60;
   showScreen('screen-interview');
   document.getElementById('iview-nick').textContent=S.user.nick;
   renderBlock();startTimer();
+}
+function restoreInterview(){
+  const raw=sessionStorage.getItem('gap_iv');
+  if(!raw)return false;
+  try{
+    const d=JSON.parse(raw);
+    // Check token still active
+    const tok=DB.tokens().find(t=>t.id===d.user.tokenId&&t.status==='active');
+    if(!tok)return false;
+    S.user=d.user;S.block=d.block||0;S.answers=d.answers||{};
+    S.timerSec=d.timerSec||45*60;S.timerTotal=d.timerTotal||45*60;
+    showScreen('screen-interview');
+    document.getElementById('iview-nick').textContent=S.user.nick;
+    renderBlock();startTimer();
+    return true;
+  }catch{return false;}
 }
 function renderBlock(){
   const qs=DB.questions(),block=qs[S.block],body=document.getElementById('interview-body');
@@ -857,7 +885,7 @@ function renderBlock(){
   body.appendChild(hd);
   block.qs.forEach((q,qi)=>{
     const item=document.createElement('div');item.className='q-item';item.style.animationDelay=(qi*.07)+'s';
-    item.innerHTML=`<div class="q-num">Вопрос ${qi+1}</div><div class="q-text">${q.text}</div>${q.hint?`<div class="q-hint">💡 ${q.hint}</div>`:''}<div class="form-group"><label>Ваш ответ</label><textarea id="ans-${q.id}" placeholder="Введите развёрнутый ответ..." oninput="S.answers['${q.id}']=this.value">${S.answers[q.id]||''}</textarea></div>`;
+    item.innerHTML=`<div class="q-num">Вопрос ${qi+1}</div><div class="q-text">${q.text}</div>${q.hint?`<div class="q-hint">💡 ${q.hint}</div>`:''}<div class="form-group"><label>Ваш ответ</label><textarea id="ans-${q.id}" placeholder="Введите развёрнутый ответ..." oninput="S.answers['${q.id}']=this.value;saveInterviewProgress()">${S.answers[q.id]||''}</textarea></div>`;
     body.appendChild(item);
   });
   const last=S.block===qs.length-1;
@@ -865,13 +893,12 @@ function renderBlock(){
   document.getElementById('btn-next').style.display=last?'none':'';
   document.getElementById('btn-submit').style.display=last?'':'none';
 }
-function nextBlock(){const qs=DB.questions();if(S.block<qs.length-1){S.block++;renderBlock();document.getElementById('interview-body').scrollIntoView({behavior:'smooth',block:'start'});}}
-function prevBlock(){if(S.block>0){S.block--;renderBlock();}}
+function nextBlock(){const qs=DB.questions();if(S.block<qs.length-1){S.block++;saveInterviewProgress();renderBlock();document.getElementById('interview-body').scrollIntoView({behavior:'smooth',block:'start'});}}
+function prevBlock(){if(S.block>0){S.block--;saveInterviewProgress();renderBlock();}}
 function submitInterview(){
-  const qs=DB.questions();let missing=false;
-  qs.forEach(b=>b.qs.forEach(q=>{if(!S.answers[q.id]||S.answers[q.id].trim().length<2)missing=true;}));
-  if(missing){alert('Пожалуйста, ответьте на все вопросы.');return;}
+  if(!confirm('Вы уверены, что хотите отправить ответы? Пропущенные вопросы будут отмечены как без ответа.'))return;
   saveResult(false);deactivateToken(S.user.tokenId);
+  clearInterviewProgress();
   if(S.timerIv)clearInterval(S.timerIv);
   showScreen('screen-success');
 }
@@ -891,7 +918,7 @@ function deactivateToken(id){
 // ═══════════════════════════════════════════════════
 function startTimer(){
   if(S.timerIv)clearInterval(S.timerIv);renderTimer();
-  S.timerIv=setInterval(()=>{S.timerSec--;renderTimer();if(S.timerSec<=0){clearInterval(S.timerIv);saveResult(true);deactivateToken(S.user.tokenId);showScreen('screen-success');}},1000);
+  S.timerIv=setInterval(()=>{S.timerSec--;renderTimer();if(S.timerSec<=0){clearInterval(S.timerIv);saveResult(true);deactivateToken(S.user.tokenId);clearInterviewProgress();showScreen('screen-success');}},1000);
 }
 function renderTimer(){
   const m=Math.floor(S.timerSec/60),sec=S.timerSec%60;
