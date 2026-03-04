@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameAdmin · Портал собеседований</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════
+   DESIGN TOKENS — DARK THEME (default)
+═══════════════════════════════════════════════════ */
+:root,[data-theme="dark"]{
+  --bg:#08090f;
+  --bg2:#0f1018;
+  --surface:#12141e;
+  --surface2:#181a26;
+  --border:rgba(255,255,255,.07);
+  --border2:rgba(255,255,255,.12);
+  --border-glow:rgba(242,100,25,.35);
+  --orange:#f26419;
+  --orange2:#e04f00;
+  --orange-soft:rgba(242,100,25,.12);
+  --orange-mid:rgba(242,100,25,.22);
+  --blue:#00c8ff;
+  --purple:#b94fff;
+  --text1:#f0eeea;
+  --text2:#a09d96;
+  --text3:#5c5a56;
+  --success:#00d48a;
+  --success-bg:rgba(0,212,138,.1);
+  --danger:#ff4060;
+  --danger-bg:rgba(255,64,96,.1);
+  --warn:#ffb830;
+  --warn-bg:rgba(255,184,48,.1);
+  --info:#00c8ff;
+  --info-bg:rgba(0,200,255,.1);
+  --card-glow:0 0 0 1px rgba(242,100,25,.15), 0 8px 32px rgba(0,0,0,.6);
+  --shadow:0 4px 20px rgba(0,0,0,.5);
+  --shadow-md:0 8px 40px rgba(0,0,0,.7);
+  --input-bg:rgba(255,255,255,.04);
+  --overlay:rgba(0,0,0,.85);
+  --grid-color:rgba(255,255,255,.025);
+  --scan-color:rgba(0,200,255,.15);
+  --radius:16px;--radius-sm:10px;
+  --t:all .22s cubic-bezier(.4,0,.2,1);
+}
+
+/* ═══════════════════════════════════════════════════
+   LIGHT THEME
+═══════════════════════════════════════════════════ */
+[data-theme="light"]{
+  --bg:#f4f2ed;
+  --bg2:#eae8e2;
+  --surface:#ffffff;
+  --surface2:#fafaf8;
+  --border:rgba(0,0,0,.08);
+  --border2:rgba(0,0,0,.14);
+  --border-glow:rgba(242,100,25,.3);
+  --orange:#e55810;
+  --orange2:#c94200;
+  --orange-soft:rgba(229,88,16,.1);
+  --orange-mid:rgba(229,88,16,.2);
+  --blue:#0086c9;
+  --purple:#8b2ee8;
+  --text1:#1a1916;
+  --text2:#4a4840;
+  --text3:#8a8880;
+  --success:#0e8e4e;
+  --success-bg:rgba(14,142,78,.1);
+  --danger:#cc2030;
+  --danger-bg:rgba(204,32,48,.1);
+  --warn:#d4620a;
+  --warn-bg:rgba(212,98,10,.1);
+  --info:#0077b6;
+  --info-bg:rgba(0,119,182,.1);
+  --card-glow:0 0 0 1px rgba(229,88,16,.12), 0 4px 20px rgba(0,0,0,.1);
+  --shadow:0 2px 12px rgba(0,0,0,.08);
+  --shadow-md:0 6px 28px rgba(0,0,0,.12);
+  --input-bg:#f8f7f4;
+  --overlay:rgba(0,0,0,.5);
+  --grid-color:rgba(0,0,0,.025);
+  --scan-color:rgba(229,88,16,.08);
+}
+
+/* ═══════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100vh;-webkit-font-smoothing:antialiased;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text1);line-height:1.6;transition:background .3s,color .3s;}
+
+/* ═══════════════════════════════════════════════════
+   GLOBAL BG EFFECTS
+═══════════════════════════════════════════════════ */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 10% 5%, rgba(242,100,25,.08) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 40% at 90% 95%, rgba(185,79,255,.06) 0%,transparent 60%),
+    repeating-linear-gradient(0deg,transparent,transparent 39px,var(--grid-color) 40px),
+    repeating-linear-gradient(90deg,transparent,transparent 39px,var(--grid-color) 40px);
+  pointer-events:none;z-index:0;transition:background .3s;
+}
+[data-theme="light"] body::before{
+  background:
+    radial-gradient(ellipse 70% 50% at 10% 5%,rgba(229,88,16,.05) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 40% at 90% 95%,rgba(139,46,232,.03) 0%,transparent 60%),
+    repeating-linear-gradient(0deg,transparent,transparent 39px,var(--grid-color) 40px),
+    repeating-linear-gradient(90deg,transparent,transparent 39px,var(--grid-color) 40px);
+}
+
+/* top accent line */
+body::after{
+  content:'';position:fixed;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent 0%,var(--orange) 30%,var(--blue) 70%,transparent 100%);
+  z-index:1000;animation:topline 5s ease-in-out infinite;
+}
+@keyframes topline{0%,100%{opacity:.6}50%{opacity:1}}
+
+/* ═══════════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════════ */
+#app{
+  position:relative;z-index:1;
+  min-height:100vh;width:100%;
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:0;
+}
+.screen{display:none;width:100%;min-height:100vh;animation:fadeUp .45s ease both;}
+.screen.active{display:block;}
+
+/* ═══════════════════════════════════════════════════
+   KEYFRAMES
+═══════════════════════════════════════════════════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideR{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideD{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes float2{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-4px) rotate(2deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes glowPulse{0%,100%{box-shadow:0 0 20px rgba(242,100,25,.3),0 0 40px rgba(242,100,25,.1)}50%{box-shadow:0 0 30px rgba(242,100,25,.6),0 0 60px rgba(242,100,25,.2)}}
+@keyframes borderSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes ripple{0%{transform:scale(0);opacity:.6}100%{transform:scale(4);opacity:0}}
+@keyframes pulseRing{0%{box-shadow:0 0 0 0 rgba(242,100,25,.4)}70%{box-shadow:0 0 0 10px rgba(242,100,25,0)}100%{box-shadow:0 0 0 0 rgba(242,100,25,0)}}
+@keyframes scanline{0%{top:-5%}100%{top:105%}}
+@keyframes countUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes neonFlicker{0%,100%{opacity:1}92%{opacity:1}93%{opacity:.7}95%{opacity:1}97%{opacity:.85}98%{opacity:1}}
+@keyframes barFill{from{width:0}to{width:var(--w)}}
+
+/* ═══════════════════════════════════════════════════
+   CENTERED WRAPPER (for non-admin screens)
+═══════════════════════════════════════════════════ */
+.centered-wrap{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:24px 16px;
+}
+
+/* ═══════════════════════════════════════════════════
+   CARD
+═══════════════════════════════════════════════════ */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:36px 40px;
+  box-shadow:var(--card-glow);
+  position:relative;overflow:hidden;
+  transition:background .3s,border-color .3s,box-shadow .3s;
+  animation:neonFlicker 12s infinite;
+}
+/* rotating glow border */
+.card-glow::before{
+  content:'';position:absolute;inset:-1px;
+  border-radius:calc(var(--radius)+1px);
+  background:conic-gradient(from 0deg,transparent 0%,var(--orange) 15%,transparent 30%,transparent 70%,var(--blue) 85%,transparent 100%);
+  z-index:-1;animation:borderSpin 6s linear infinite;opacity:.5;
+}
+.card-glow::after{
+  content:'';position:absolute;inset:1px;
+  border-radius:calc(var(--radius)-1px);
+  background:var(--surface);z-index:-1;
+}
+/* scan line */
+.scanline{
+  position:absolute;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--scan-color),transparent);
+  pointer-events:none;z-index:10;
+  animation:scanline 6s linear infinite;
+}
+/* top accent */
+.card-accent::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--orange),var(--blue),var(--orange2));
+  border-radius:var(--radius) var(--radius) 0 0;z-index:1;
+}
+
+/* ═══════════════════════════════════════════════════
+   THEME TOGGLE
+═══════════════════════════════════════════════════ */
+#theme-btn{
+  position:fixed;top:16px;right:16px;z-index:500;
+  width:42px;height:42px;border-radius:50%;
+  background:var(--surface);border:1px solid var(--border2);
+  cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--shadow);transition:var(--t);color:var(--text1);
+}
+#theme-btn:hover{transform:scale(1.1) rotate(20deg);border-color:var(--orange);box-shadow:0 0 14px var(--orange-soft);}
+
+/* ═══════════════════════════════════════════════════
+   BRAND
+═══════════════════════════════════════════════════ */
+.brand{display:flex;align-items:center;gap:14px;margin-bottom:28px;}
+.brand-icon{
+  width:50px;height:50px;
+  background:linear-gradient(135deg,var(--orange),var(--orange2));
+  border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;
+  box-shadow:0 4px 18px rgba(242,100,25,.4);
+  animation:float 4s ease-in-out infinite,glowPulse 3s ease-in-out infinite;
+  flex-shrink:0;
+}
+.brand-text h1{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;letter-spacing:1px;color:var(--text1);}
+.brand-text p{font-size:11px;color:var(--text3);font-weight:500;margin-top:1px;letter-spacing:2px;text-transform:uppercase;}
+
+/* ═══════════════════════════════════════════════════
+   CHIPS / BADGES
+═══════════════════════════════════════════════════ */
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;}
+.chip-dot{width:7px;height:7px;border-radius:50%;}
+.chip-online{background:var(--success-bg);color:var(--success);border:1px solid rgba(0,212,138,.2);}
+.chip-online .chip-dot{background:var(--success);animation:pulseRing 2s infinite;}
+.chip-offline{background:var(--danger-bg);color:var(--danger);border:1px solid rgba(255,64,96,.2);}
+.chip-offline .chip-dot{background:var(--danger);}
+.chip-warn{background:var(--warn-bg);color:var(--warn);border:1px solid rgba(255,184,48,.2);}
+.chip-info{background:var(--info-bg);color:var(--info);border:1px solid rgba(0,200,255,.2);}
+
+/* ═══════════════════════════════════════════════════
+   ALERTS
+═══════════════════════════════════════════════════ */
+.alert{display:flex;align-items:flex-start;gap:10px;padding:13px 16px;border-radius:var(--radius-sm);font-size:14px;margin-bottom:16px;animation:slideD .3s ease;border:1px solid transparent;}
+.alert-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.alert-info{background:var(--info-bg);color:var(--info);border-color:rgba(0,200,255,.2);}
+.alert-success{background:var(--success-bg);color:var(--success);border-color:rgba(0,212,138,.2);}
+.alert-danger{background:var(--danger-bg);color:var(--danger);border-color:rgba(255,64,96,.2);}
+.alert-warn{background:var(--warn-bg);color:var(--warn);border-color:rgba(255,184,48,.2);}
+
+/* ═══════════════════════════════════════════════════
+   FORMS
+═══════════════════════════════════════════════════ */
+.form-group{margin-bottom:18px;}
+.form-group label{display:block;font-size:11px;font-weight:600;color:var(--text3);margin-bottom:7px;letter-spacing:1.5px;text-transform:uppercase;}
+.form-group input,.form-group textarea,.form-group select{
+  width:100%;background:var(--input-bg);
+  border:1.5px solid var(--border2);border-radius:var(--radius-sm);
+  padding:13px 16px;font-family:'Inter',sans-serif;font-size:15px;color:var(--text1);
+  outline:none;transition:var(--t);
+}
+.form-group input:hover,.form-group textarea:hover{border-color:rgba(242,100,25,.3);}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{
+  border-color:var(--orange);
+  box-shadow:0 0 0 3px var(--orange-soft),0 0 20px rgba(242,100,25,.1);
+  background:var(--surface2);
+}
+.form-group textarea{resize:vertical;min-height:130px;line-height:1.7;}
+.form-group select{cursor:pointer;appearance:none;}
+.input-row{display:flex;gap:10px;}
+.input-row input{flex:1;}
+
+/* ═══════════════════════════════════════════════════
+   BUTTONS — Premium Glow
+═══════════════════════════════════════════════════ */
+.btn{
+  position:relative;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 26px;
+  border:none;border-radius:var(--radius-sm);
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;overflow:hidden;
+  transition:var(--t);white-space:nowrap;text-decoration:none;
+  isolation:isolate;
+  letter-spacing:.3px;
+}
+/* rotating border on hover */
+.btn::before{
+  content:'';position:absolute;inset:-2px;border-radius:calc(var(--radius-sm)+2px);
+  background:conic-gradient(from 0deg,var(--orange),var(--blue),var(--orange),var(--blue),var(--orange));
+  z-index:-2;opacity:0;animation:borderSpin 3s linear infinite;
+  transition:opacity .3s;
+}
+.btn::after{content:'';position:absolute;inset:1px;border-radius:calc(var(--radius-sm)-1px);background:inherit;z-index:-1;}
+.btn:hover{transform:translateY(-2px) scale(1.03);}
+.btn:hover::before{opacity:1;}
+.btn:active{transform:scale(.97) !important;}
+
+/* ripple */
+.btn-rpl{position:absolute;pointer-events:none;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.4);animation:ripple .5s ease-out forwards;}
+
+/* variants */
+.btn-orange{background:linear-gradient(135deg,var(--orange),var(--orange2));color:#fff;box-shadow:0 4px 18px rgba(242,100,25,.4);}
+.btn-orange:hover{box-shadow:0 8px 28px rgba(242,100,25,.6);}
+.btn-outline{background:transparent;border:1.5px solid var(--border2);color:var(--text2);}
+.btn-outline:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-soft);box-shadow:0 0 14px rgba(242,100,25,.15);}
+.btn-ghost{background:transparent;color:var(--text2);}
+.btn-ghost:hover{background:var(--surface2);color:var(--text1);}
+.btn-danger{background:var(--danger-bg);color:var(--danger);border:1.5px solid rgba(255,64,96,.2);}
+.btn-danger:hover{background:var(--danger);color:#fff;box-shadow:0 4px 18px rgba(255,64,96,.4);}
+.btn-success{background:var(--success-bg);color:var(--success);border:1.5px solid rgba(0,212,138,.2);}
+.btn-success:hover{background:var(--success);color:#fff;box-shadow:0 4px 18px rgba(0,212,138,.4);}
+.btn-sm{padding:8px 16px;font-size:12px;}
+.btn-full{width:100%;}
+
+/* icon expand on hover */
+.btn .btn-icon{transition:transform .25s;display:inline-block;}
+.btn:hover .btn-icon{transform:translateX(4px) scale(1.2);}
+
+/* ═══════════════════════════════════════════════════
+   DIVIDER / SECTION TITLE
+═══════════════════════════════════════════════════ */
+.divider{height:1px;background:var(--border);margin:20px 0;}
+.section-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--text1);display:flex;align-items:center;gap:10px;margin-bottom:18px;letter-spacing:.5px;}
+.section-title .stag{padding:3px 10px;border-radius:20px;background:var(--orange-soft);color:var(--orange);font-size:11px;font-weight:600;font-family:'Inter',sans-serif;}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ═══════════════════════════════════════════════════
+   TAGS
+═══════════════════════════════════════════════════ */
+.tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.tag-active{background:var(--success-bg);color:var(--success);}
+.tag-used{background:var(--danger-bg);color:var(--danger);}
+.tag-pending{background:var(--warn-bg);color:var(--warn);}
+.tag-approved{background:var(--success-bg);color:var(--success);}
+.tag-rejected{background:var(--danger-bg);color:var(--danger);}
+
+/* ═══════════════════════════════════════════════════
+   TABLES
+═══════════════════════════════════════════════════ */
+.data-table{width:100%;border-collapse:collapse;font-size:13px;}
+.data-table th{text-align:left;padding:11px 14px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);background:var(--surface2);border-bottom:1px solid var(--border);}
+.data-table td{padding:13px 14px;border-bottom:1px solid var(--border);color:var(--text1);vertical-align:middle;}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr{transition:background .15s;}
+.data-table tr:hover td{background:var(--orange-soft);}
+.overflow-x{overflow-x:auto;border-radius:var(--radius-sm);border:1px solid var(--border);}
+
+/* ═══════════════════════════════════════════════════
+   CODE BOX
+═══════════════════════════════════════════════════ */
+.code-box{
+  background:var(--surface2);border:2px dashed var(--border2);
+  border-radius:var(--radius-sm);padding:14px 20px;
+  font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600;letter-spacing:6px;
+  color:var(--orange);text-align:center;cursor:pointer;transition:var(--t);margin:10px 0;
+}
+.code-box:hover{border-color:var(--orange);background:var(--orange-soft);box-shadow:0 0 20px rgba(242,100,25,.15);}
+
+/* ═══════════════════════════════════════════════════
+   TOGGLE SWITCH
+═══════════════════════════════════════════════════ */
+.toggle-row{display:flex;align-items:center;gap:14px;}
+.toggle{position:relative;width:54px;height:28px;cursor:pointer;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-track{position:absolute;inset:0;background:var(--danger-bg);border:1px solid rgba(255,64,96,.3);border-radius:14px;transition:.4s;}
+.toggle-thumb{position:absolute;width:22px;height:22px;top:3px;left:3px;background:var(--danger);border-radius:50%;box-shadow:0 0 8px rgba(255,64,96,.5);transition:.4s;}
+.toggle input:checked~.toggle-track{background:var(--success-bg);border-color:rgba(0,212,138,.3);}
+.toggle input:checked~.toggle-thumb{left:29px;background:var(--success);box-shadow:0 0 10px rgba(0,212,138,.6);}
+.toggle-label{font-size:13px;font-weight:600;color:var(--text2);}
+
+/* ═══════════════════════════════════════════════════
+   TIMER
+═══════════════════════════════════════════════════ */
+.timer-bar{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 20px;display:flex;align-items:center;gap:16px;margin-bottom:18px;transition:var(--t);}
+.timer-ring{position:relative;width:52px;height:52px;flex-shrink:0;}
+.timer-ring svg{transform:rotate(-90deg);}
+.ring-track{fill:none;stroke:var(--border2);stroke-width:5;}
+.ring-fill{fill:none;stroke:var(--orange);stroke-width:5;stroke-linecap:round;stroke-dasharray:138;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .5s;filter:drop-shadow(0 0 4px var(--orange));}
+.ring-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--orange);}
+.timer-info{flex:1;}
+.timer-info .ti-l{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;}
+.timer-info .ti-v{font-size:24px;font-weight:800;color:var(--text1);font-variant-numeric:tabular-nums;font-family:'JetBrains Mono',monospace;}
+.timer-warn .ring-fill{stroke:var(--warn);filter:drop-shadow(0 0 4px var(--warn));}
+.timer-warn .ti-v{color:var(--warn);}
+.timer-crit .ring-fill{stroke:var(--danger);filter:drop-shadow(0 0 6px var(--danger));}
+.timer-crit .ti-v{color:var(--danger);animation:glowPulse 1s infinite;}
+
+/* ═══════════════════════════════════════════════════
+   QUESTION DOTS
+═══════════════════════════════════════════════════ */
+.q-dots{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:16px;}
+.q-dot{height:5px;flex:1;min-width:14px;max-width:40px;border-radius:3px;background:var(--border2);transition:.3s;}
+.q-dot.active{background:var(--orange);box-shadow:0 0 6px rgba(242,100,25,.5);}
+.q-dot.done{background:var(--success);}
+
+/* ═══════════════════════════════════════════════════
+   BLOCK HEADER
+═══════════════════════════════════════════════════ */
+.block-hd{display:flex;align-items:center;gap:10px;margin-bottom:18px;padding:12px 16px;background:var(--orange-soft);border:1px solid rgba(242,100,25,.2);border-radius:var(--radius-sm);}
+.block-badge{background:var(--orange);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;font-family:'JetBrains Mono',monospace;}
+.block-name{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--text1);letter-spacing:.5px;}
+
+/* ═══════════════════════════════════════════════════
+   QUESTION ITEM
+═══════════════════════════════════════════════════ */
+.q-item{margin-bottom:22px;animation:slideR .4s ease both;}
+.q-item .q-num{font-size:10px;font-weight:700;color:var(--text3);margin-bottom:6px;letter-spacing:1.5px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;}
+.q-item .q-text{font-size:15px;color:var(--text1);line-height:1.7;margin-bottom:10px;padding-left:14px;border-left:3px solid var(--orange);}
+.q-item .q-hint{font-size:12px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 12px;margin-bottom:10px;font-style:italic;}
+
+/* ═══════════════════════════════════════════════════
+   STAT CARDS
+═══════════════════════════════════════════════════ */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:22px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px 16px;transition:var(--t);position:relative;overflow:hidden;cursor:default;}
+.stat-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.3),0 0 20px var(--orange-soft);border-color:var(--border-glow);}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--sc-color,var(--orange));border-radius:var(--radius-sm) var(--radius-sm) 0 0;}
+.stat-card .sc-v{font-size:32px;font-weight:800;line-height:1;margin-bottom:4px;color:var(--sc-color,var(--orange));animation:countUp .5s ease;font-family:'Rajdhani',sans-serif;}
+.stat-card .sc-l{font-size:12px;font-weight:500;color:var(--text3);}
+
+/* ═══════════════════════════════════════════════════
+   ADMIN LAYOUT — full screen
+═══════════════════════════════════════════════════ */
+.admin-layout{display:flex;min-height:100vh;width:100%;}
+.admin-sidebar{
+  width:240px;min-height:100vh;flex-shrink:0;
+  background:var(--surface);border-right:1px solid var(--border);
+  padding:24px 16px;display:flex;flex-direction:column;gap:2px;
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  transition:background .3s,border-color .3s;
+}
+.admin-main{flex:1;padding:28px;overflow-x:hidden;background:var(--bg);min-height:100vh;}
+.nav-section{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;padding:14px 10px 6px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:14px;font-weight:500;color:var(--text2);transition:var(--t);border:1.5px solid transparent;margin-bottom:2px;}
+.nav-item:hover{background:var(--surface2);color:var(--text1);transform:translateX(3px);}
+.nav-item.active{background:var(--orange-soft);color:var(--orange);border-color:rgba(242,100,25,.25);font-weight:600;}
+.nav-item.active .nav-icon{filter:drop-shadow(0 0 4px var(--orange));}
+.nav-icon{width:18px;text-align:center;font-size:16px;}
+
+/* ═══════════════════════════════════════════════════
+   CHARTS
+═══════════════════════════════════════════════════ */
+.chart-bar-wrap{display:flex;flex-direction:column;gap:10px;}
+.cbar{display:grid;grid-template-columns:150px 1fr 44px;gap:10px;align-items:center;font-size:13px;}
+.cbar-label{color:var(--text2);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cbar-track{height:12px;background:var(--surface2);border-radius:6px;overflow:hidden;}
+.cbar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--orange),#ff8c42);animation:barFill .8s ease both;--w:0%;}
+.cbar-val{font-weight:700;color:var(--text1);text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;}
+
+/* DONUT */
+.donut-wrap{display:flex;gap:24px;align-items:center;flex-wrap:wrap;}
+.donut{position:relative;width:120px;height:120px;flex-shrink:0;}
+.donut svg{transform:rotate(-90deg);}
+.donut-track{fill:none;stroke:var(--surface2);stroke-width:16;}
+.donut-arc{fill:none;stroke-width:16;stroke-linecap:round;transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1);}
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.donut-center .dv{font-size:24px;font-weight:800;color:var(--text1);font-family:'Rajdhani',sans-serif;}
+.donut-center .dl{font-size:11px;color:var(--text3);font-weight:500;}
+.donut-legend{display:flex;flex-direction:column;gap:9px;}
+.dl-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);}
+.dl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+
+/* ═══════════════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════════════ */
+.modal-overlay{position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(6px);z-index:2000;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;animation:fadeIn .2s ease;}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:32px;max-width:720px;width:100%;max-height:90vh;overflow-y:auto;animation:scaleIn .25s ease;box-shadow:var(--shadow-md);position:relative;}
+.modal-close{position:absolute;top:18px;right:18px;background:var(--surface2);border:none;border-radius:6px;width:30px;height:30px;font-size:16px;cursor:pointer;color:var(--text2);display:flex;align-items:center;justify-content:center;transition:var(--t);}
+.modal-close:hover{background:var(--danger-bg);color:var(--danger);}
+
+/* ═══════════════════════════════════════════════════
+   OFFLINE / SUCCESS HERO
+═══════════════════════════════════════════════════ */
+.offline-hero{text-align:center;padding:60px 24px;}
+.offline-hero .hero-icon{font-size:80px;animation:float2 3s ease-in-out infinite;display:block;margin-bottom:22px;filter:drop-shadow(0 0 20px rgba(255,64,96,.4));}
+.offline-hero h2{font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;color:var(--danger);margin-bottom:12px;letter-spacing:1px;}
+.offline-hero p{color:var(--text2);font-size:15px;max-width:380px;margin:0 auto;line-height:1.8;}
+.success-hero{text-align:center;padding:40px 24px;}
+.success-circle{width:84px;height:84px;border-radius:50%;background:var(--success-bg);color:var(--success);display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 22px;animation:pulseRing 2s infinite,float 4s ease-in-out infinite;border:2px solid rgba(0,212,138,.3);box-shadow:0 0 30px rgba(0,212,138,.2);}
+
+/* ═══════════════════════════════════════════════════
+   ANSWER VIEW
+═══════════════════════════════════════════════════ */
+.ans-block{margin-bottom:20px;}
+.ans-q{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px;padding-left:12px;border-left:3px solid var(--orange);}
+.ans-a{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;font-size:14px;color:var(--text1);line-height:1.7;white-space:pre-wrap;}
+
+/* ═══════════════════════════════════════════════════
+   POLICY PAGE
+═══════════════════════════════════════════════════ */
+.policy-content h2{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;margin-bottom:6px;letter-spacing:.5px;}
+.policy-content h3{font-size:16px;font-weight:700;color:var(--orange);margin:20px 0 8px;}
+.policy-content p{color:var(--text2);font-size:14px;line-height:1.8;margin-bottom:10px;}
+.policy-content ul{color:var(--text2);font-size:14px;line-height:1.8;padding-left:20px;margin-bottom:10px;}
+
+/* ═══════════════════════════════════════════════════
+   FOOTER LINKS
+═══════════════════════════════════════════════════ */
+.footer-links{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
+.footer-links a{font-size:12px;color:var(--text3);text-decoration:none;font-weight:500;transition:var(--t);}
+.footer-links a:hover{color:var(--orange);}
+
+/* ═══════════════════════════════════════════════════
+   UTILITY
+═══════════════════════════════════════════════════ */
+.flex{display:flex;} .gap-8{gap:8px;} .gap-12{gap:12px;} .wrap{flex-wrap:wrap;}
+.mt-16{margin-top:16px;} .mt-20{margin-top:20px;} .mb-16{margin-bottom:16px;} .mb-20{margin-bottom:20px;}
+.text-c{text-align:center;} .text-sm{font-size:13px;color:var(--text3);}
+.bold{font-weight:700;} .orange{color:var(--orange);} .mono{font-family:'JetBrains Mono',monospace;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+/* ═══════════════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════════════ */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--orange);}
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════ */
+@media(max-width:900px){
+  .admin-layout{flex-direction:column;}
+  .admin-sidebar{width:100%;min-height:auto;height:auto;position:static;flex-direction:row;flex-wrap:wrap;padding:12px 16px;}
+  .admin-sidebar .brand{display:none;}
+  .nav-section{display:none;}
+  .two-col{grid-template-columns:1fr;}
+}
+@media(max-width:560px){
+  .card{padding:22px 18px;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .cbar{grid-template-columns:80px 1fr 32px;}
+  .admin-main{padding:16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- THEME TOGGLE -->
+<button id="theme-btn" onclick="toggleTheme()" title="Сменить тему">🌙</button>
+
+<div id="app">
+
+<!-- ═══════════ OFFLINE ═══════════ -->
+<div class="screen active" id="screen-offline">
+  <div class="centered-wrap">
+    <div class="card card-glow card-accent" style="max-width:500px;width:100%;">
+      <div class="scanline"></div>
+      <div class="brand" style="justify-content:center;flex-direction:column;text-align:center;"><div class="brand-icon">🎮</div><div class="brand-text"><h1>Arkhangelsk</h1><p>Система набора администраторов</p></div></div>
+      <div class="offline-hero"><span class="hero-icon">🔴</span><h2>Система неактивна</h2><p>В данный момент обзвоны не проводятся. Следите за объявлениями проекта.</p></div>
+      <div class="footer-links">
+        <a href="#" onclick="showPolicy('terms')">Правила использования</a>
+        <a href="#" onclick="showPolicy('privacy')">Конфиденциальность</a>
+        <a href="#" onclick="showPolicy('rules')">Правила собеседования</a>
+        <a href="#" onclick="showAdminLogin()" style="opacity:.3;font-size:11px;">⚙ Админ</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ LOGIN ═══════════ -->
+<div class="screen" id="screen-login">
+  <div class="centered-wrap">
+    <div class="card card-glow card-accent" style="max-width:460px;width:100%;">
+      <div class="scanline"></div>
+      <div class="brand" style="justify-content:center;flex-direction:column;text-align:center;margin-bottom:22px;"><div class="brand-icon">🎮</div><div class="brand-text"><h1>Arkhangelsk</h1><p>Система набора администраторов</p></div></div>
+      <div style="text-align:center;margin-bottom:20px;"><span class="chip chip-online"><span class="chip-dot"></span>Приём заявок открыт</span></div>
+      <div class="alert alert-info"><span class="alert-icon">🔑</span><span>Введите ваш никнейм и выданный одноразовый код доступа</span></div>
+      <div class="form-group"><label>Игровой никнейм</label><input type="text" id="login-nick" placeholder="Ваш никнейм" autocomplete="off"></div>
+      <div class="form-group"><label>Код доступа</label><input type="password" id="login-code" placeholder="••••••••" autocomplete="off" maxlength="32"></div>
+      <div id="login-err" class="alert alert-danger" style="display:none;"></div>
+      <div id="login-locked" class="alert alert-warn" style="display:none;"><span class="alert-icon">⏳</span><span>Много попыток. Подождите <strong id="lock-cd">30</strong> сек.</span></div>
+      <button class="btn btn-orange btn-full mt-16" id="login-btn" onclick="doLogin()">Войти в систему <span class="btn-icon">→</span></button>
+      <div class="footer-links" style="margin-top:12px;">
+        <a href="#" onclick="showPolicy('terms')">Правила</a>
+        <a href="#" onclick="showPolicy('privacy')">Конфиденциальность</a>
+        <a href="#" onclick="showPolicy('rules')">Правила собеседования</a>
+        <a href="#" onclick="showAdminLogin()" style="opacity:.3;font-size:11px;">⚙ Админ</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ ADMIN LOGIN ═══════════ -->
+<div class="screen" id="screen-admin-login">
+  <div class="centered-wrap">
+    <div class="card card-glow card-accent" style="max-width:380px;width:100%;">
+      <div class="scanline"></div>
+      <div class="brand"><div class="brand-icon" style="background:linear-gradient(135deg,#444,#222);">⚙</div><div class="brand-text"><h1>Панель администратора</h1><p>Ограниченный доступ</p></div></div>
+      <div class="alert alert-warn"><span class="alert-icon">⚠</span><span>Только для администраторов системы</span></div>
+      <div class="form-group"><label>Пароль администратора</label><input type="password" id="admin-pass" placeholder="••••••••" autocomplete="off"></div>
+      <div id="admin-login-err" class="alert alert-danger" style="display:none;"></div>
+      <div class="flex gap-8 mt-16"><button class="btn btn-outline" onclick="goBack()">← Назад</button><button class="btn btn-orange" style="flex:1;" onclick="doAdminLogin()">Войти <span class="btn-icon">→</span></button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ INTERVIEW ═══════════ -->
+<div class="screen" id="screen-interview">
+  <div style="max-width:860px;margin:0 auto;padding:28px 20px;">
+    <div class="card card-accent card-glow">
+      <div class="scanline"></div>
+      <div class="flex gap-12 wrap" style="justify-content:space-between;align-items:flex-start;margin-bottom:18px;">
+        <div><div class="section-title" style="margin-bottom:4px;font-size:20px;">Собеседование</div><div style="font-size:13px;color:var(--text3);">👤 <strong id="iview-nick"></strong></div></div>
+        <span class="chip chip-online"><span class="chip-dot"></span>В процессе</span>
+      </div>
+      <div class="timer-bar" id="timer-bar">
+        <div class="timer-ring"><svg width="52" height="52" viewBox="0 0 52 52"><circle class="ring-track" cx="26" cy="26" r="22"/><circle class="ring-fill" id="ring-fill" cx="26" cy="26" r="22"/></svg><div class="ring-label" id="ring-pct">100%</div></div>
+        <div class="timer-info"><div class="ti-l">Оставшееся время</div><div class="ti-v" id="timer-val">45:00</div></div>
+        <div class="text-sm mono" id="block-ctr">Блок 1/3</div>
+      </div>
+      <div class="q-dots" id="q-dots"></div>
+      <div id="interview-body"></div>
+      <div class="flex gap-8 mt-20" id="iview-nav">
+        <button class="btn btn-outline" id="btn-prev" onclick="prevBlock()" style="display:none;">← Назад</button>
+        <button class="btn btn-orange" id="btn-next" onclick="nextBlock()" style="flex:1;">Далее <span class="btn-icon">→</span></button>
+        <button class="btn btn-success" id="btn-submit" onclick="submitInterview()" style="display:none;flex:1;"><span class="btn-icon">✅</span> Отправить ответы</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SUCCESS ═══════════ -->
+<div class="screen" id="screen-success">
+  <div class="centered-wrap">
+    <div class="card card-glow card-accent" style="max-width:500px;width:100%;">
+      <div class="success-hero">
+        <div class="success-circle">✅</div>
+        <h2 style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;margin-bottom:12px;letter-spacing:.5px;">Ответы отправлены!</h2>
+        <div class="alert alert-success"><span class="alert-icon">📨</span><span>Ваши ответы переданы администрации. Ожидайте решения по результатам собеседования.</span></div>
+        <p class="text-sm" style="margin-top:12px;line-height:1.8;">Ваш одноразовый код деактивирован. Повторный вход невозможен.<br>Результаты сообщат через официальные каналы проекта.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ ADMIN PANEL — FULLSCREEN ═══════════ -->
+<div class="screen" id="screen-admin" style="display:none;">
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="brand" style="margin-bottom:8px;padding:0 8px;">
+        <div class="brand-icon" style="width:38px;height:38px;font-size:18px;border-radius:10px;animation:none;">⚙</div>
+        <div class="brand-text"><h1 style="font-size:16px;">Admin Panel</h1><p>Arkhangelsk</p></div>
+      </div>
+      <div class="divider" style="margin:10px 0;"></div>
+      <div class="nav-section">Навигация</div>
+      <div class="nav-item active" id="nav-dash" onclick="adminTab('dash')"><span class="nav-icon">📊</span> Дашборд</div>
+      <div class="nav-item" id="nav-analytics" onclick="adminTab('analytics')"><span class="nav-icon">📈</span> Аналитика</div>
+      <div class="nav-item" id="nav-access" onclick="adminTab('access')"><span class="nav-icon">🔑</span> Доступы</div>
+      <div class="nav-item" id="nav-answers" onclick="adminTab('answers')"><span class="nav-icon">📝</span> Ответы</div>
+      <div class="nav-item" id="nav-table" onclick="adminTab('table')"><span class="nav-icon">📋</span> Общая таблица</div>
+      <div class="nav-item" id="nav-questions" onclick="adminTab('questions')"><span class="nav-icon">❓</span> Вопросы</div>
+      <div class="nav-section">Система</div>
+      <div style="padding:6px 10px;">
+        <div class="toggle-row">
+          <label class="toggle"><input type="checkbox" id="site-toggle" onchange="toggleSite()"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+          <span class="toggle-label" id="site-label">OFFLINE</span>
+        </div>
+      </div>
+      <div class="nav-item" id="nav-settings" onclick="adminTab('settings')"><span class="nav-icon">🔒</span> Настройки</div>
+      <div style="flex:1;"></div>
+      <div class="divider" style="margin:8px 0;"></div>
+      <button class="btn btn-danger btn-sm btn-full" onclick="adminLogout()">🚪 Выйти</button>
+    </aside>
+    <!-- Main -->
+    <main class="admin-main" id="admin-content"></main>
+  </div>
+</div>
+
+<!-- ═══════════ POLICY ═══════════ -->
+<div class="screen" id="screen-policy">
+  <div style="max-width:760px;margin:0 auto;padding:28px 20px;">
+    <div class="card card-accent">
+      <button class="btn btn-ghost btn-sm mb-16" onclick="closePolicy()">← Назад</button>
+      <div id="policy-body"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- #app -->
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-answers">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-answers')">✕</button>
+    <div class="section-title">📋 Ответы кандидата</div>
+    <div id="modal-answers-body"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════════════════
+function toggleTheme(){
+  const html=document.documentElement;
+  const isDark=html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme',isDark?'light':'dark');
+  document.getElementById('theme-btn').textContent=isDark?'🌙':'☀';
+  localStorage.setItem('gap_theme',isDark?'light':'dark');
+}
+(function(){
+  const t=localStorage.getItem('gap_theme')||'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  document.getElementById('theme-btn').textContent=t==='dark'?'☀':'🌙';
+})();
+
+// ═══════════════════════════════════════════════════
+// DB
+// ═══════════════════════════════════════════════════
+const DB={
+  _g(k){try{return JSON.parse(localStorage.getItem('gap_'+k));}catch{return null;}},
+  _s(k,v){localStorage.setItem('gap_'+k,JSON.stringify(v));},
+  settings(){return this._g('cfg')||{active:false,adminHash:hs('Ark#9mX$vQ2!')};},
+  saveSettings(v){this._s('cfg',v);},
+  tokens(){return this._g('tok')||[];},
+  saveTokens(v){this._s('tok',v);},
+  results(){return this._g('res')||[];},
+  saveResults(v){this._s('res',v);},
+  questions(){return this._g('qs')||DQ;},
+  saveQuestions(v){this._s('qs',v);}
+};
+function hs(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h)^s.charCodeAt(i);return(h>>>0).toString(16);}
+
+// ═══════════════════════════════════════════════════
+// QUESTIONS — correct ones as requested
+// ═══════════════════════════════════════════════════
+const DQ=[
+  {id:'b1',title:'Блок 1: Личная информация',qs:[
+    {id:'q1',text:'Как вас зовут?'},
+    {id:'q2',text:'Сколько вам лет?'},
+    {id:'q3',text:'Откуда вы?'},
+    {id:'q4',text:'Чем занимаетесь?'},
+    {id:'q5',text:'Какой у вас часовой пояс от МСК?'},
+    {id:'q6',text:'Как давно играете на проекте?'},
+    {id:'q7',text:'Были ли ранее администратором? Если да — опишите опыт.'}
+  ]},
+  {id:'b2',title:'Блок 2: Понимание роли администратора',qs:[
+    {id:'q8',text:'По вашему мнению, кто такой администратор и чем он занимается?'},
+    {id:'q9',text:'Может ли администратор играть в казино?',hint:'Подсказка: подумайте с точки зрения правил проекта'},
+    {id:'q10',text:'Может ли администратор иметь дом?',hint:'Подсказка: имущество — отдельная тема'},
+    {id:'q11',text:'Может ли администратор иметь бизнес?'},
+    {id:'q12',text:'Может ли администратор работать на любой работе после рабочего дня при стабильном репорте?'},
+    {id:'q13',text:'Может ли администратор добавлять своих друзей во фракции и выдавать им ранги?'}
+  ]},
+  {id:'b3',title:'Блок 3: Регламент и наказания',qs:[
+    {id:'q14',text:'Какое наказание выдаётся за ДМ, ДБ, ТК?'},
+    {id:'q15',text:'Какое наказание выдаётся за CapsLock?'},
+    {id:'q16',text:'Какое наказание даётся за NonRP Обман?'},
+    {id:'q17',text:'Какое наказание выдаётся за обман администрации?'},
+    {id:'q18',text:'Какое наказание выдаётся за ЕПП на инкассаторской машине или фуре?'},
+    {id:'q19',text:'Что даётся за упоминание/оскорбление родных?'},
+    {id:'q20',text:'Какое наказание за NonRP ВЧ?'},
+    {id:'q21',text:'Какое наказание выдаётся за неуважительное отношение к администрации или её оскорбление?'},
+    {id:'q22',text:'Какое наказание выдаётся за рекламу промокодов?'},
+    {id:'q23',text:'Какое наказание выдаётся за оскорбление проекта?'},
+    {id:'q24',text:'Какое наказание выдаётся за нахождение госс в б/у, казино?'},
+    {id:'q25',text:'Какое наказание выдаётся за MassDM?'},
+    {id:'q26',text:'Представьте ситуацию: вы стоите в поле, к вам подходит игрок и бьёт вас кулаками. Ваши действия?'},
+    {id:'q27',text:'Вы заходите в игру и видите, как администратор подозрительно много выдаёт наказаний без весомой причины. Ваши действия?'},
+    {id:'q28',text:'Нужно ли иметь доказательства на выдачу абана?'}
+  ]}
+];
+
+
+
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+const S={user:null,block:0,answers:{},timerSec:45*60,timerTotal:45*60,timerIv:null,prevScreen:null};
+const BF={
+  a(){return+(sessionStorage.getItem('bf_a')||0);},
+  inc(){sessionStorage.setItem('bf_a',this.a()+1);},
+  reset(){sessionStorage.setItem('bf_a','0');},
+  locked(){return(+(sessionStorage.getItem('bf_u')||0))>Date.now();},
+  secs(){return Math.ceil(((+(sessionStorage.getItem('bf_u')||0))-Date.now())/1000);},
+  lock(s){sessionStorage.setItem('bf_u',Date.now()+s*1000);}
+};
+
+// ═══════════════════════════════════════════════════
+// SCREENS
+// ═══════════════════════════════════════════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='';});
+  const el=document.getElementById(id);
+  if(el){el.classList.add('active');}
+}
+function boot(){
+  const c=DB.settings();
+  const tog=document.getElementById('site-toggle');
+  if(tog)tog.checked=c.active;
+  const lbl=document.getElementById('site-label');
+  if(lbl)lbl.textContent=c.active?'ONLINE':'OFFLINE';
+  // Restore admin session on reload
+  if(sessionStorage.getItem('gap_admin')==='1'){
+    showAdminPanel();
+    return;
+  }
+  showScreen(c.active?'screen-login':'screen-offline');
+}
+function goBack(){showScreen(DB.settings().active?'screen-login':'screen-offline');}
+function showAdminLogin(){
+  S.prevScreen=document.querySelector('.screen.active')?.id;
+  document.getElementById('admin-pass').value='';
+  document.getElementById('admin-login-err').style.display='none';
+  showScreen('screen-admin-login');
+}
+
+// ═══════════════════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════════════════
+function doLogin(){
+  if(BF.locked()){startLockUI();return;}
+  const nick=document.getElementById('login-nick').value.trim();
+  const code=document.getElementById('login-code').value.trim();
+  const errEl=document.getElementById('login-err');
+  if(!nick||!code){showAlert(errEl,'Заполните все поля','alert-warn');return;}
+  const token=DB.tokens().find(t=>t.nick.toLowerCase()===nick.toLowerCase()&&hs(code)===t.codeHash&&t.status==='active');
+  if(!token){
+    BF.inc();
+    if(BF.a()>=5){BF.lock(60);BF.reset();startLockUI();return;}
+    showAlert(errEl,`Неверный никнейм или код (попытка ${BF.a()}/5)`,'alert-danger');
+    return;
+  }
+  BF.reset();errEl.style.display='none';
+  S.user={nick:token.nick,tokenId:token.id};
+  startInterview();
+}
+function startLockUI(){
+  document.getElementById('login-err').style.display='none';
+  const lk=document.getElementById('login-locked');lk.style.display='flex';
+  document.getElementById('login-btn').disabled=true;
+  const iv=setInterval(()=>{
+    if(!BF.locked()){clearInterval(iv);lk.style.display='none';document.getElementById('login-btn').disabled=false;}
+    else document.getElementById('lock-cd').textContent=BF.secs();
+  },500);
+}
+
+// ═══════════════════════════════════════════════════
+// INTERVIEW
+// ═══════════════════════════════════════════════════
+function startInterview(){
+  S.block=0;S.answers={};S.timerSec=45*60;S.timerTotal=45*60;
+  showScreen('screen-interview');
+  document.getElementById('iview-nick').textContent=S.user.nick;
+  renderBlock();startTimer();
+}
+function renderBlock(){
+  const qs=DB.questions(),block=qs[S.block],body=document.getElementById('interview-body');
+  document.getElementById('block-ctr').textContent=`Блок ${S.block+1}/${qs.length}`;
+  document.getElementById('q-dots').innerHTML=qs.map((_,i)=>`<div class="q-dot${i===S.block?' active':i<S.block?' done':''}"></div>`).join('');
+  body.innerHTML='';
+  const hd=document.createElement('div');hd.className='block-hd';
+  hd.innerHTML=`<span class="block-badge">БЛОК ${S.block+1}/${qs.length}</span><span class="block-name">${block.title}</span>`;
+  body.appendChild(hd);
+  block.qs.forEach((q,qi)=>{
+    const item=document.createElement('div');item.className='q-item';item.style.animationDelay=(qi*.07)+'s';
+    item.innerHTML=`<div class="q-num">Вопрос ${qi+1}</div><div class="q-text">${q.text}</div>${q.hint?`<div class="q-hint">💡 ${q.hint}</div>`:''}<div class="form-group"><label>Ваш ответ</label><textarea id="ans-${q.id}" placeholder="Введите развёрнутый ответ..." oninput="S.answers['${q.id}']=this.value">${S.answers[q.id]||''}</textarea></div>`;
+    body.appendChild(item);
+  });
+  const last=S.block===qs.length-1;
+  document.getElementById('btn-prev').style.display=S.block>0?'':'none';
+  document.getElementById('btn-next').style.display=last?'none':'';
+  document.getElementById('btn-submit').style.display=last?'':'none';
+}
+function nextBlock(){const qs=DB.questions();if(S.block<qs.length-1){S.block++;renderBlock();document.getElementById('interview-body').scrollIntoView({behavior:'smooth',block:'start'});}}
+function prevBlock(){if(S.block>0){S.block--;renderBlock();}}
+function submitInterview(){
+  const qs=DB.questions();let missing=false;
+  qs.forEach(b=>b.qs.forEach(q=>{if(!S.answers[q.id]||S.answers[q.id].trim().length<2)missing=true;}));
+  if(missing){alert('Пожалуйста, ответьте на все вопросы.');return;}
+  saveResult(false);deactivateToken(S.user.tokenId);
+  if(S.timerIv)clearInterval(S.timerIv);
+  showScreen('screen-success');
+}
+function saveResult(auto){
+  const r=DB.results();
+  r.push({id:'r'+Date.now(),nick:S.user.nick,tokenId:S.user.tokenId,date:new Date().toISOString(),answers:{...S.answers},status:'pending',timeSpent:S.timerTotal-S.timerSec,autoSubmit:!!auto});
+  DB.saveResults(r);
+}
+function deactivateToken(id){
+  const t=DB.tokens(),tk=t.find(t=>t.id===id);
+  if(tk){tk.status='used';tk.usedAt=new Date().toISOString();}
+  DB.saveTokens(t);
+}
+
+// ═══════════════════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════════════════
+function startTimer(){
+  if(S.timerIv)clearInterval(S.timerIv);renderTimer();
+  S.timerIv=setInterval(()=>{S.timerSec--;renderTimer();if(S.timerSec<=0){clearInterval(S.timerIv);saveResult(true);deactivateToken(S.user.tokenId);showScreen('screen-success');}},1000);
+}
+function renderTimer(){
+  const m=Math.floor(S.timerSec/60),sec=S.timerSec%60;
+  document.getElementById('timer-val').textContent=`${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  const pct=S.timerSec/S.timerTotal,circ=2*Math.PI*22;
+  document.getElementById('ring-fill').style.strokeDashoffset=circ*(1-pct);
+  document.getElementById('ring-pct').textContent=Math.round(pct*100)+'%';
+  document.getElementById('timer-bar').className='timer-bar'+(S.timerSec<300?' timer-crit':S.timerSec<600?' timer-warn':'');
+}
+
+// ═══════════════════════════════════════════════════
+// ADMIN
+// ═══════════════════════════════════════════════════
+function doAdminLogin(){
+  const pass=document.getElementById('admin-pass').value;
+  if(hs(pass)===DB.settings().adminHash){
+    sessionStorage.setItem('gap_admin','1');
+    showAdminPanel();
+  } else showAlert(document.getElementById('admin-login-err'),'Неверный пароль','alert-danger');
+}
+function adminLogout(){
+  sessionStorage.removeItem('gap_admin');
+  goBack();
+}
+function showAdminPanel(){
+  const el=document.getElementById('screen-admin');
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='';});
+  el.classList.add('active');el.style.display='block';
+  const c=DB.settings();
+  document.getElementById('site-toggle').checked=c.active;
+  document.getElementById('site-label').textContent=c.active?'ONLINE':'OFFLINE';
+  adminTab('dash');
+}
+function toggleSite(){
+  const c=DB.settings();c.active=document.getElementById('site-toggle').checked;
+  DB.saveSettings(c);document.getElementById('site-label').textContent=c.active?'ONLINE':'OFFLINE';
+}
+function adminTab(tab){
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  const nav=document.getElementById('nav-'+tab);if(nav)nav.classList.add('active');
+  const p=document.getElementById('admin-content');
+  p.style.animation='none';p.offsetHeight;p.style.animation='fadeUp .3s ease';
+  p.innerHTML='';
+  ({dash:rdDash,analytics:rdAnalytics,access:rdAccess,answers:rdAnswers,table:rdTable,questions:rdQuestions,settings:rdSettings})[tab]?.(p);
+}
+
+// ═══════════════════════════════════════════════════
+// CORRECT ANSWERS MAP
+// ═══════════════════════════════════════════════════
+const CA={
+  q9:'Да, может',
+  q10:'Да, может',
+  q11:'Нет, не может',
+  q12:'Нет, запрещено работать на любых работах',
+  q13:'Запрещено',
+  q14:'Jail 60 min',
+  q15:'Mute 30 min',
+  q16:'Permban',
+  q17:'Ban 7-15',
+  q18:'Jail 60 min',
+  q19:'Mute 120 min / Ban 7-15',
+  q20:'Jail 30 / Warn',
+  q21:'Mute 180 min',
+  q22:'Ban 30',
+  q23:'Mute 300 min / Ban 30',
+  q24:'Jail 30 min',
+  q25:'Warn / Ban 3-7',
+  q26:'Ничего — администратор является нрп персонажем',
+  q27:'Выдать Абан до выяснения обстоятельств',
+  q28:'Да, конечно'
+};
+
+// Fuzzy match correct answer
+function checkAnswer(qid, ans){
+  const correct=CA[qid];
+  if(!correct)return null; // no correct answer defined — open question
+  const a=ans.toLowerCase().replace(/[^а-яa-z0-9\s]/gi,'').trim();
+  const c=correct.toLowerCase().replace(/[^а-яa-z0-9\s]/gi,'').trim();
+  // check if key words present
+  const keywords=c.split(/\s+/).filter(w=>w.length>2);
+  const matched=keywords.filter(w=>a.includes(w));
+  return matched.length>=Math.ceil(keywords.length*0.6);
+}
+
+// ═══════════════════════════════════════════════════
+// TAB: DASH
+// ═══════════════════════════════════════════════════
+function rdDash(p){
+  const toks=DB.tokens(),res=DB.results(),c=DB.settings();
+  const active=toks.filter(t=>t.status==='active').length;
+  const pending=res.filter(r=>r.status==='pending').length;
+  const approved=res.filter(r=>r.status==='approved').length;
+  p.innerHTML=`
+    <div class="section-title" style="font-size:20px;">📊 Дашборд <span class="stag">Обзор системы</span></div>
+    <div class="stats-grid">
+      <div class="stat-card" style="--sc-color:var(--orange)"><div class="sc-v">${toks.length}</div><div class="sc-l">Всего токенов</div></div>
+      <div class="stat-card" style="--sc-color:var(--success)"><div class="sc-v">${active}</div><div class="sc-l">Активных</div></div>
+      <div class="stat-card" style="--sc-color:var(--danger)"><div class="sc-v">${toks.length-active}</div><div class="sc-l">Использовано</div></div>
+      <div class="stat-card" style="--sc-color:var(--info)"><div class="sc-v">${res.length}</div><div class="sc-l">Всего ответов</div></div>
+      <div class="stat-card" style="--sc-color:var(--warn)"><div class="sc-v">${pending}</div><div class="sc-l">На рассмотрении</div></div>
+      <div class="stat-card" style="--sc-color:var(--success)"><div class="sc-v">${approved}</div><div class="sc-l">Одобрено</div></div>
+    </div>
+    <div class="two-col mb-20">
+      <div class="card">
+        <div class="section-title" style="font-size:15px;">⚡ Быстрые действия</div>
+        <div class="flex gap-8 wrap">
+          <button class="btn btn-orange" onclick="adminTab('access')">🔑 Создать доступ</button>
+          <button class="btn btn-outline" onclick="adminTab('answers')">📝 Ответы</button>
+          <button class="btn btn-outline" onclick="adminTab('table')">📋 Таблица</button>
+          <button class="btn btn-outline" onclick="adminTab('analytics')">📈 Аналитика</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportCSV()">📥 CSV</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title" style="font-size:15px;">🔴 Статус системы</div>
+        <div class="alert ${c.active?'alert-success':'alert-danger'}">
+          <span class="alert-icon">${c.active?'✅':'🔴'}</span>
+          <span>${c.active?'Сайт активен — приём заявок открыт':'Сайт отключён — обзвоны не проводятся'}</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// TAB: ANALYTICS
+// ═══════════════════════════════════════════════════
+function rdAnalytics(p){
+  const res=DB.results(),toks=DB.tokens();
+  if(!res.length){p.innerHTML=`<div class="card card-accent"><div class="section-title">📈 Аналитика</div><div class="alert alert-info"><span class="alert-icon">ℹ</span><span>Пока нет завершённых собеседований.</span></div></div>`;return;}
+  const total=res.length;
+  const st={pending:0,approved:0,rejected:0};
+  res.forEach(r=>{if(st[r.status]!==undefined)st[r.status]++;});
+  const qs=DB.questions();const allQs=[];qs.forEach(b=>b.qs.forEach(q=>allQs.push(q)));
+
+  // Correct/incorrect stats per question
+  const qStats=allQs.filter(q=>CA[q.id]).map(q=>{
+    let correct=0,incorrect=0;
+    res.forEach(r=>{
+      const ans=(r.answers[q.id]||'').trim();
+      if(ans.length<2)return;
+      const ok=checkAnswer(q.id,ans);
+      if(ok===true)correct++;
+      else if(ok===false)incorrect++;
+    });
+    return{id:q.id,text:q.text.substring(0,45)+'…',correct,incorrect,total:correct+incorrect};
+  }).filter(q=>q.total>0);
+
+  const avgLens=allQs.map(q=>{
+    const ls=res.map(r=>(r.answers[q.id]||'').length).filter(l=>l>0);
+    return{text:q.text.substring(0,40)+'…',avg:ls.length?Math.round(ls.reduce((a,b)=>a+b,0)/ls.length):0};
+  }).sort((a,b)=>b.avg-a.avg);
+  const maxA=avgLens[0]?.avg||1;
+  const timeSeries=res.filter(r=>r.timeSpent>0).map(r=>({nick:r.nick,t:r.timeSpent}));
+  const avgTime=timeSeries.length?Math.round(timeSeries.reduce((a,b)=>a+b.t,0)/timeSeries.length):0;
+  const daily={};res.forEach(r=>{const d=r.date.substring(0,10);daily[d]=(daily[d]||0)+1;});
+  const dArr=Object.entries(daily).sort((a,b)=>a[0]>b[0]?1:-1).slice(-7);
+  const maxD=Math.max(...dArr.map(d=>d[1]),1);
+  const circ=2*Math.PI*52;
+  const pP=st.pending/total,pA=st.approved/total,pR=st.rejected/total;
+
+  p.innerHTML=`
+    <div class="section-title" style="font-size:20px;">📈 Аналитика <span class="stag">${total} собеседований</span></div>
+    <div class="stats-grid mb-20">
+      <div class="stat-card" style="--sc-color:var(--orange)"><div class="sc-v">${total}</div><div class="sc-l">Завершено</div></div>
+      <div class="stat-card" style="--sc-color:var(--warn)"><div class="sc-v">${st.pending}</div><div class="sc-l">На рассмотрении</div></div>
+      <div class="stat-card" style="--sc-color:var(--success)"><div class="sc-v">${st.approved}</div><div class="sc-l">Одобрено</div></div>
+      <div class="stat-card" style="--sc-color:var(--danger)"><div class="sc-v">${st.rejected}</div><div class="sc-l">Отклонено</div></div>
+      <div class="stat-card" style="--sc-color:var(--info)"><div class="sc-v">${fmtTime(avgTime)}</div><div class="sc-l">Среднее время</div></div>
+      <div class="stat-card" style="--sc-color:var(--blue)"><div class="sc-v">${toks.filter(t=>t.status==='active').length}</div><div class="sc-l">Активных токенов</div></div>
+    </div>
+
+    <div class="two-col mb-20">
+      <div class="card">
+        <div class="section-title" style="font-size:15px;">Статусы заявок</div>
+        <div class="donut-wrap">
+          <div class="donut">
+            <svg width="120" height="120" viewBox="0 0 120 120">
+              <circle class="donut-track" cx="60" cy="60" r="52"/>
+              <circle class="donut-arc" cx="60" cy="60" r="52" stroke="${st.pending?'#ffb830':'transparent'}" stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-pP)}"/>
+              <circle class="donut-arc" cx="60" cy="60" r="52" stroke="${st.approved?'#00d48a':'transparent'}" stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-pA)}" style="transform-origin:60px 60px;transform:rotate(${pP*360}deg)"/>
+              <circle class="donut-arc" cx="60" cy="60" r="52" stroke="${st.rejected?'#ff4060':'transparent'}" stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-pR)}" style="transform-origin:60px 60px;transform:rotate(${(pP+pA)*360}deg)"/>
+            </svg>
+            <div class="donut-center"><div class="dv">${total}</div><div class="dl">всего</div></div>
+          </div>
+          <div class="donut-legend">
+            <div class="dl-item"><span class="dl-dot" style="background:#ffb830"></span>Ожидание: <strong>${st.pending}</strong></div>
+            <div class="dl-item"><span class="dl-dot" style="background:#00d48a"></span>Одобрено: <strong>${st.approved}</strong></div>
+            <div class="dl-item"><span class="dl-dot" style="background:#ff4060"></span>Отклонено: <strong>${st.rejected}</strong></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title" style="font-size:15px;">Активность по дням</div>
+        ${dArr.length?`<div class="chart-bar-wrap">${dArr.map(([d,v])=>`<div class="cbar"><div class="cbar-label">${d.substring(5)}</div><div class="cbar-track"><div class="cbar-fill" style="--w:${Math.round(v/maxD*100)}%;width:${Math.round(v/maxD*100)}%"></div></div><div class="cbar-val">${v}</div></div>`).join('')}</div>`:'<div class="text-sm">Недостаточно данных</div>'}
+      </div>
+    </div>
+
+    ${qStats.length?`
+    <div class="card mb-20">
+      <div class="section-title" style="font-size:15px;">✅ Правильность ответов на вопросы с эталоном</div>
+      <div class="chart-bar-wrap">
+        ${qStats.map(q=>{
+          const pct=q.total?Math.round(q.correct/q.total*100):0;
+          const clr=pct>=80?'var(--success)':pct>=50?'var(--warn)':'var(--danger)';
+          return`<div style="margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:4px;"><span title="${q.text}">${q.text}</span><span style="color:${clr};font-weight:700;">${pct}% (${q.correct}/${q.total})</span></div>
+            <div class="cbar-track" style="height:10px;"><div class="cbar-fill" style="--w:${pct}%;width:${pct}%;background:${clr};"></div></div>
+          </div>`;}).join('')}
+      </div>
+      <div class="alert alert-info" style="margin-top:14px;"><span class="alert-icon">ℹ</span><span>Вопросы открытого типа (блок 1, часть блока 2) не имеют эталонного ответа и не анализируются.</span></div>
+    </div>`:''}
+
+    <div class="two-col mb-20">
+      <div class="card">
+        <div class="section-title" style="font-size:15px;">Средняя длина ответов</div>
+        <div class="chart-bar-wrap">${avgLens.slice(0,10).map(q=>`<div class="cbar"><div class="cbar-label" title="${q.text}">${q.text}</div><div class="cbar-track"><div class="cbar-fill" style="--w:${Math.round(q.avg/maxA*100)}%;width:${Math.round(q.avg/maxA*100)}%;background:linear-gradient(90deg,var(--info),#74b9ff)"></div></div><div class="cbar-val">${q.avg}</div></div>`).join('')}</div>
+      </div>
+      <div class="card">
+        <div class="section-title" style="font-size:15px;">Время прохождения</div>
+        ${timeSeries.length?`<div class="chart-bar-wrap">${timeSeries.slice(-8).map(t=>`<div class="cbar"><div class="cbar-label">${escH(t.nick)}</div><div class="cbar-track"><div class="cbar-fill" style="--w:${Math.round(t.t/S.timerTotal*100)}%;width:${Math.round(t.t/S.timerTotal*100)}%;background:linear-gradient(90deg,var(--success),#55efc4)"></div></div><div class="cbar-val">${fmtTime(t.t)}</div></div>`).join('')}</div>`:'<div class="text-sm">Нет данных</div>'}
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// TAB: ACCESS
+// ═══════════════════════════════════════════════════
+let _gc='';
+function rdAccess(p){
+  const toks=DB.tokens();
+  p.innerHTML=`
+    <div class="section-title" style="font-size:20px;">🔑 Управление доступами <span class="stag">Кандидаты</span></div>
+    <div class="card card-accent mb-20">
+      <div class="section-title" style="font-size:15px;">Создать доступ</div>
+      <div class="form-group"><label>Никнейм кандидата</label><input type="text" id="new-nick" placeholder="Игровой никнейм" autocomplete="off"></div>
+      <div class="form-group">
+        <label>Код доступа</label>
+        <div class="input-row"><input type="text" id="new-code" placeholder="Введите вручную или нажмите «Генерировать»" autocomplete="off" oninput="_gc=this.value"><button class="btn btn-outline btn-sm" onclick="genCode()">⚡ Генерировать</button></div>
+        <div style="font-size:12px;color:var(--text3);margin-top:5px;">Введите свой пароль или нажмите «Генерировать» для случайного кода.</div>
+      </div>
+      <div id="gen-preview" style="display:none;"><div class="code-box" id="code-display" onclick="copyCode()"></div><div style="text-align:center;font-size:12px;color:var(--text3);">↑ Нажмите для копирования</div></div>
+      <div class="form-group" style="margin-top:12px;"><label>Заметка (необязательно)</label><input type="text" id="new-note" placeholder="Например: кандидат из Discord" autocomplete="off"></div>
+      <div id="create-msg" class="alert" style="display:none;"></div>
+      <button class="btn btn-orange mt-16" onclick="createToken()"><span class="btn-icon">✅</span> Создать доступ</button>
+    </div>
+    <div class="card">
+      <div class="section-title" style="font-size:15px;">Все токены <span class="stag">${toks.length}</span></div>
+      <div class="overflow-x">
+        <table class="data-table"><thead><tr><th>Никнейм</th><th>Код</th><th>Статус</th><th>Создан</th><th>Использован</th><th>Заметка</th><th>Действия</th></tr></thead>
+        <tbody>${toks.length?toks.slice().reverse().map(t=>`<tr>
+          <td><strong>${escH(t.nick)}</strong></td>
+          <td><span class="mono orange" style="font-size:12px;">${escH(t.rawCode||'—')}</span></td>
+          <td><span class="tag tag-${t.status==='active'?'active':'used'}">${t.status==='active'?'АКТИВЕН':'ИСПОЛЬЗОВАН'}</span></td>
+          <td style="font-size:12px;color:var(--text3);">${fmtDate(t.createdAt)}</td>
+          <td style="font-size:12px;color:var(--text3);">${t.usedAt?fmtDate(t.usedAt):'—'}</td>
+          <td style="font-size:12px;color:var(--text3);">${escH(t.note||'')}</td>
+          <td><div class="flex gap-8">${t.status==='active'?`<button class="btn btn-danger btn-sm" onclick="revokeToken('${t.id}')">Отозвать</button>`:''}<button class="btn btn-ghost btn-sm" onclick="deleteToken('${t.id}')">✕</button></div></td>
+        </tr>`).join(''):'<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3);">Нет токенов</td></tr>'}</tbody></table>
+      </div>
+    </div>`;
+}
+function genCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let code='';for(let i=0;i<12;i++){if(i&&i%4===0)code+='-';code+=c[Math.floor(Math.random()*c.length)];}
+  _gc=code;document.getElementById('new-code').value=code;document.getElementById('code-display').textContent=code;document.getElementById('gen-preview').style.display='block';}
+function copyCode(){const el=document.getElementById('code-display');navigator.clipboard.writeText(el.textContent).then(()=>{const o=el.textContent;el.textContent='✓ Скопировано!';el.style.color='var(--success)';setTimeout(()=>{el.textContent=o;el.style.color='';},1500);});}
+function createToken(){
+  const nick=document.getElementById('new-nick').value.trim();
+  const code=document.getElementById('new-code').value.trim();
+  const note=document.getElementById('new-note').value.trim();
+  const msg=document.getElementById('create-msg');
+  if(!nick){showAlert(msg,'Введите никнейм','alert-warn');return;}
+  if(!code){showAlert(msg,'Введите или сгенерируйте код','alert-warn');return;}
+  const toks=DB.tokens();
+  if(toks.find(t=>t.nick.toLowerCase()===nick.toLowerCase()&&t.status==='active')){showAlert(msg,'У кандидата уже есть активный токен','alert-warn');return;}
+  toks.push({id:'t'+Date.now(),nick,codeHash:hs(code.replace(/-/g,'')),rawCode:code,status:'active',createdAt:new Date().toISOString(),usedAt:null,note});
+  DB.saveTokens(toks);_gc='';
+  showAlert(msg,`Доступ создан для ${nick}. Код: ${code}`,'alert-success');
+  setTimeout(()=>rdAccess(document.getElementById('admin-content')),1500);
+}
+function revokeToken(id){if(!confirm('Отозвать токен?'))return;const t=DB.tokens(),tk=t.find(t=>t.id===id);if(tk){tk.status='used';tk.usedAt=new Date().toISOString();}DB.saveTokens(t);rdAccess(document.getElementById('admin-content'));}
+function deleteToken(id){if(!confirm('Удалить?'))return;DB.saveTokens(DB.tokens().filter(t=>t.id!==id));rdAccess(document.getElementById('admin-content'));}
+
+// ═══════════════════════════════════════════════════
+// TAB: ANSWERS
+// ═══════════════════════════════════════════════════
+function rdAnswers(p){
+  const res=DB.results();
+  p.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:20px;">
+      <div class="section-title" style="margin:0;font-size:20px;">📝 Ответы кандидатов <span class="stag">${res.length}</span></div>
+      <div class="flex gap-8"><button class="btn btn-outline btn-sm" onclick="exportCSV()">📥 CSV</button><button class="btn btn-outline btn-sm" onclick="exportJSON()">📥 JSON</button></div>
+    </div>
+    <div class="card">
+      <div class="overflow-x"><table class="data-table"><thead><tr><th>Кандидат</th><th>Дата</th><th>Статус</th><th>Время</th><th>Ошибок</th><th>Действия</th></tr></thead>
+      <tbody>${res.length?res.slice().reverse().map(r=>{
+        const qs=DB.questions();const allQs=[];qs.forEach(b=>b.qs.forEach(q=>allQs.push(q)));
+        let errors=0;allQs.forEach(q=>{if(!CA[q.id])return;const ans=(r.answers[q.id]||'').trim();if(ans.length>1&&checkAnswer(q.id,ans)===false)errors++;});
+        return`<tr>
+          <td><strong>${escH(r.nick)}</strong></td>
+          <td style="font-size:12px;color:var(--text3);">${fmtDate(r.date)}</td>
+          <td><select onchange="updateStatus('${r.id}',this.value)" style="border:1px solid var(--border2);border-radius:6px;padding:4px 8px;font-size:12px;background:var(--surface);color:var(--text1);cursor:pointer;">
+            <option value="pending" ${r.status==='pending'?'selected':''}>⏳ Ожидание</option>
+            <option value="approved" ${r.status==='approved'?'selected':''}>✅ Одобрен</option>
+            <option value="rejected" ${r.status==='rejected'?'selected':''}>❌ Отклонён</option>
+          </select></td>
+          <td class="mono" style="font-size:12px;">${fmtTime(r.timeSpent)}</td>
+          <td><span style="color:${errors===0?'var(--success)':errors<=3?'var(--warn)':'var(--danger)'};font-weight:700;font-family:'JetBrains Mono',monospace;">${errors} ошибок</span></td>
+          <td><button class="btn btn-orange btn-sm" onclick="viewAnswers('${r.id}')">👁 Смотреть</button></td>
+        </tr>`;}).join(''):'<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text3);">Ответов пока нет</td></tr>'}</tbody></table>
+      </div>
+    </div>`;
+}
+function updateStatus(id,status){const r=DB.results(),ri=r.find(r=>r.id===id);if(ri)ri.status=status;DB.saveResults(r);}
+function viewAnswers(id){
+  const res=DB.results(),qs=DB.questions(),r=res.find(r=>r.id===id);if(!r)return;
+  const allQs=[];qs.forEach(b=>b.qs.forEach(q=>allQs.push(q)));
+  const totalChars=allQs.reduce((a,q)=>a+(r.answers[q.id]||'').length,0);
+  const answered=allQs.filter(q=>(r.answers[q.id]||'').trim().length>2).length;
+  let errors=0,correctCount=0,totalChecked=0;
+  allQs.forEach(q=>{if(!CA[q.id])return;const ans=(r.answers[q.id]||'').trim();if(ans.length<2)return;totalChecked++;const ok=checkAnswer(q.id,ans);if(ok===true)correctCount++;else errors++;});
+
+  let html=`
+    <div class="alert alert-info mb-16"><span class="alert-icon">👤</span><div><strong>${escH(r.nick)}</strong> · ${fmtDate(r.date)}<br><span style="font-size:12px;">${answered}/${allQs.length} вопросов · ${totalChars} симв · ${fmtTime(r.timeSpent)}</span></div></div>
+    <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;">
+      <div class="stat-card" style="--sc-color:var(--orange);"><div class="sc-v">${answered}</div><div class="sc-l">Ответов</div></div>
+      <div class="stat-card" style="--sc-color:var(--success);"><div class="sc-v">${correctCount}</div><div class="sc-l">Правильно</div></div>
+      <div class="stat-card" style="--sc-color:var(--danger);"><div class="sc-v">${errors}</div><div class="sc-l">Ошибок</div></div>
+      <div class="stat-card" style="--sc-color:var(--info);"><div class="sc-v">${totalChecked?Math.round(correctCount/totalChecked*100):0}%</div><div class="sc-l">Точность</div></div>
+    </div>`;
+  qs.forEach((block,bi)=>{
+    html+=`<div class="block-hd" style="margin-bottom:12px;"><span class="block-badge">БЛОК ${bi+1}</span><span class="block-name">${escH(block.title)}</span></div>`;
+    block.qs.forEach((q,qi)=>{
+      const ans=(r.answers[q.id]||'').trim();
+      const hasCA=!!CA[q.id];
+      const ok=hasCA&&ans.length>1?checkAnswer(q.id,ans):null;
+      const statusIco=ok===true?'✅':ok===false?'❌':'•';
+      const statusClr=ok===true?'var(--success)':ok===false?'var(--danger)':'var(--text3)';
+      html+=`<div class="ans-block">
+        <div class="ans-q">
+          <span style="color:var(--text3);font-size:11px;">В${qi+1} · </span>${escH(q.text)}
+          ${hasCA?`<span style="margin-left:6px;font-size:13px;color:${statusClr};">${statusIco}</span>`:''}
+        </div>
+        <div class="ans-a">${ans?escH(ans):'<span style="color:var(--text3);font-style:italic;">Нет ответа</span>'}</div>
+        ${hasCA&&ok===false?`<div style="margin-top:6px;font-size:12px;padding:6px 12px;background:var(--success-bg);border:1px solid rgba(0,212,138,.2);border-radius:6px;color:var(--success);"><strong>Правильный ответ:</strong> ${escH(CA[q.id])}</div>`:''}
+      </div>`;
+    });
+    html+='<div class="divider"></div>';
+  });
+  document.getElementById('modal-answers-body').innerHTML=html;
+  document.getElementById('modal-answers').classList.add('open');
+}
+
+// ═══════════════════════════════════════════════════
+// TAB: TABLE
+// ═══════════════════════════════════════════════════
+function rdTable(p){
+  const res=DB.results(),qs=DB.questions();
+  const allQs=[];qs.forEach(b=>b.qs.forEach(q=>allQs.push(q)));
+  p.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:20px;">
+      <div class="section-title" style="margin:0;font-size:20px;">📋 Общая таблица <span class="stag">${res.length} кандидатов</span></div>
+      <div class="flex gap-8"><button class="btn btn-outline btn-sm" onclick="exportCSV()">📥 CSV</button><button class="btn btn-outline btn-sm" onclick="exportJSON()">📥 JSON</button></div>
+    </div>
+    <div class="card">
+      ${res.length?`<div class="overflow-x"><table class="data-table"><thead><tr>
+        <th style="min-width:110px;">Никнейм</th><th style="min-width:100px;">Дата</th><th style="min-width:80px;">Статус</th><th style="min-width:70px;">Время</th><th style="min-width:80px;">Ошибки</th>
+        ${allQs.map((q,i)=>`<th style="min-width:160px;">В${i+1}: ${escH(q.text.substring(0,24))}…</th>`).join('')}
+      </tr></thead><tbody>
+        ${res.slice().reverse().map(r=>{
+          let errors=0;allQs.forEach(q=>{if(!CA[q.id])return;const ans=(r.answers[q.id]||'').trim();if(ans.length>1&&checkAnswer(q.id,ans)===false)errors++;});
+          return`<tr>
+            <td><strong>${escH(r.nick)}</strong></td>
+            <td style="font-size:12px;color:var(--text3);">${fmtDate(r.date)}</td>
+            <td><span class="tag tag-${r.status}">${{pending:'⏳',approved:'✅',rejected:'❌'}[r.status]||r.status}</span></td>
+            <td class="mono" style="font-size:12px;">${fmtTime(r.timeSpent)}</td>
+            <td style="color:${errors===0?'var(--success)':errors<=3?'var(--warn)':'var(--danger)'};font-weight:700;font-family:'JetBrains Mono',monospace;">${errors}</td>
+            ${allQs.map(q=>{
+              const ans=(r.answers[q.id]||'').trim();
+              const ok=CA[q.id]&&ans.length>1?checkAnswer(q.id,ans):null;
+              const bg=ok===true?'rgba(0,212,138,.08)':ok===false?'rgba(255,64,96,.08)':'';
+              return`<td style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:${bg};" title="${escH(ans)}">${escH((ans||'—').substring(0,60))}${ans.length>60?'…':''}</td>`;
+            }).join('')}
+          </tr>`;}).join('')}
+      </tbody></table></div>`:`<div class="alert alert-info"><span class="alert-icon">ℹ</span><span>Нет завершённых собеседований</span></div>`}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// TAB: QUESTIONS
+// ═══════════════════════════════════════════════════
+function rdQuestions(p){
+  const qs=DB.questions();
+  p.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:20px;">
+      <div class="section-title" style="margin:0;font-size:20px;">❓ Редактор вопросов</div>
+      <div class="flex gap-8"><button class="btn btn-orange btn-sm" onclick="addBlock()">+ Блок</button><button class="btn btn-success btn-sm" onclick="showAlert(document.getElementById('qs-msg'),'Вопросы сохранены','alert-success')">💾 Сохранить</button></div>
+    </div>
+    <div id="qs-blocks">${qs.map((b,bi)=>`
+    <div class="card card-accent mb-20">
+      <div class="flex gap-8 wrap" style="margin-bottom:16px;align-items:center;">
+        <span class="block-badge">БЛОК ${bi+1}</span>
+        <input type="text" value="${escH(b.title)}" oninput="updateBlockTitle(${bi},this.value)" style="flex:1;border:1.5px solid var(--border2);border-radius:8px;padding:9px 14px;font-size:14px;font-weight:600;background:var(--input-bg);color:var(--text1);outline:none;min-width:160px;" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor=''">
+        <button class="btn btn-danger btn-sm" onclick="deleteBlock(${bi})">🗑</button>
+      </div>
+      ${b.qs.map((q,qi)=>`<div style="display:flex;gap:8px;margin-bottom:10px;align-items:flex-start;">
+        <span style="font-size:12px;font-weight:700;color:var(--text3);padding-top:12px;min-width:20px;">${qi+1}.</span>
+        <textarea oninput="updateQuestion(${bi},${qi},this.value)" style="flex:1;border:1.5px solid var(--border2);border-radius:8px;padding:10px 14px;font-size:13px;background:var(--input-bg);color:var(--text1);outline:none;resize:vertical;min-height:64px;line-height:1.6;" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor=''">${escH(q.text)}</textarea>
+        <button class="btn btn-ghost btn-sm" onclick="deleteQuestion(${bi},${qi})" style="color:var(--danger);">✕</button>
+      </div>`).join('')}
+      <button class="btn btn-outline btn-sm mt-16" onclick="addQuestion(${bi})">+ Добавить вопрос</button>
+    </div>`).join('')}</div>
+    <div id="qs-msg" class="alert" style="display:none;"></div>`;
+}
+function updateBlockTitle(bi,v){const q=DB.questions();q[bi].title=v;DB.saveQuestions(q);}
+function updateQuestion(bi,qi,v){const q=DB.questions();q[bi].qs[qi].text=v;DB.saveQuestions(q);}
+function deleteQuestion(bi,qi){if(!confirm('Удалить?'))return;const q=DB.questions();q[bi].qs.splice(qi,1);DB.saveQuestions(q);rdQuestions(document.getElementById('admin-content'));}
+function addQuestion(bi){const q=DB.questions();q[bi].qs.push({id:'q'+Date.now(),text:'Новый вопрос'});DB.saveQuestions(q);rdQuestions(document.getElementById('admin-content'));}
+function deleteBlock(bi){if(!confirm('Удалить блок?'))return;const q=DB.questions();q.splice(bi,1);DB.saveQuestions(q);rdQuestions(document.getElementById('admin-content'));}
+function addBlock(){const q=DB.questions();q.push({id:'b'+Date.now(),title:'Новый блок',qs:[{id:'q'+Date.now(),text:'Новый вопрос'}]});DB.saveQuestions(q);rdQuestions(document.getElementById('admin-content'));}
+
+// ═══════════════════════════════════════════════════
+// TAB: SETTINGS
+// ═══════════════════════════════════════════════════
+function rdSettings(p){
+  p.innerHTML=`
+    <div class="section-title" style="font-size:20px;">🔒 Настройки системы</div>
+    <div class="card card-accent mb-20">
+      <div class="section-title" style="font-size:15px;">Смена пароля администратора</div>
+      <div class="form-group"><label>Новый пароль</label><input type="password" id="np1" placeholder="Оставьте пустым, чтобы не менять" autocomplete="off"></div>
+      <div class="form-group"><label>Подтвердите пароль</label><input type="password" id="np2" placeholder="••••••••" autocomplete="off"></div>
+      <div id="settings-msg" class="alert" style="display:none;"></div>
+      <button class="btn btn-orange mt-16" onclick="saveAdminPass()">💾 Сохранить пароль</button>
+    </div>
+    <div class="card">
+      <div class="section-title" style="font-size:15px;color:var(--danger);">⚠ Опасная зона</div>
+      <div class="flex gap-8 wrap">
+        <button class="btn btn-danger btn-sm" onclick="if(confirm('Удалить ВСЕ ответы?')){DB.saveResults([]);rdSettings(document.getElementById('admin-content'));}">🗑 Очистить ответы</button>
+        <button class="btn btn-danger btn-sm" onclick="if(confirm('Удалить ВСЕ токены?')){DB.saveTokens([]);rdSettings(document.getElementById('admin-content'));}">🗑 Очистить токены</button>
+        <button class="btn btn-danger btn-sm" onclick="if(confirm('Сбросить вопросы к дефолту?')){DB.saveQuestions(DQ);rdSettings(document.getElementById('admin-content'));}">🔄 Сбросить вопросы</button>
+      </div>
+    </div>`;
+}
+function saveAdminPass(){
+  const p1=document.getElementById('np1').value,p2=document.getElementById('np2').value,msg=document.getElementById('settings-msg');
+  if(!p1){showAlert(msg,'Введите пароль','alert-warn');return;}
+  if(p1!==p2){showAlert(msg,'Пароли не совпадают','alert-danger');return;}
+  const c=DB.settings();c.adminHash=hs(p1);DB.saveSettings(c);
+  showAlert(msg,'✅ Пароль изменён','alert-success');
+  document.getElementById('np1').value='';document.getElementById('np2').value='';
+}
+
+// ═══════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════
+function exportCSV(){
+  const res=DB.results(),qs=DB.questions();
+  const allQs=[];qs.forEach(b=>b.qs.forEach(q=>allQs.push(q)));
+  let csv='ID,Никнейм,Дата,Статус,Время,'+allQs.map(q=>'"'+q.text.replace(/"/g,'""')+'"').join(',')+'\n';
+  res.forEach(r=>{csv+=`${r.id},${r.nick},${r.date},${r.status},${fmtTime(r.timeSpent)},`+allQs.map(q=>'"'+(r.answers[q.id]||'').replace(/"/g,'""')+'"').join(',')+'\n';});
+  dl('results.csv',csv,'text/csv');
+}
+function exportJSON(){dl('results.json',JSON.stringify(DB.results(),null,2),'application/json');}
+function dl(n,c,t){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=n;a.click();}
+
+// ═══════════════════════════════════════════════════
+// POLICY
+// ═══════════════════════════════════════════════════
+const POLICIES={
+  terms:`<div class="policy-content">
+    <div class="chip chip-info" style="margin-bottom:12px;">📜 Правила использования</div>
+    <h2>Правила использования портала</h2>
+    <p style="color:var(--text3);margin-bottom:16px;">Используя портал, вы принимаете настоящие Правила.</p>
+    <h3>1. Общие положения</h3><p>Arkhangelsk — система проведения онлайн-собеседований для кандидатов на должность администратора игрового проекта.</p>
+    <h3>2. Доступ к системе</h3><p>Доступ предоставляется исключительно кандидатам с персональным одноразовым кодом. Передача кода третьим лицам запрещена.</p>
+    <h3>3. Запрещённые действия</h3><ul><li>Предоставление заведомо ложной информации</li><li>Использование чужого кода доступа</li><li>Попытки взлома или обхода системы защиты</li><li>Более 5 неверных попыток входа</li></ul>
+    <h3>4. Временные ограничения</h3><p>На прохождение отводится 45 минут. По истечении времени ответы сохраняются автоматически.</p>
+    <h3>5. Результаты</h3><p>Результаты кандидату не показываются. Решение сообщается через официальные игровые каналы.</p>
+    <h3>6. Изменение правил</h3><p>Администрация вправе изменять Правила без предварительного уведомления.</p>
+  </div>`,
+  privacy:`<div class="policy-content">
+    <div class="chip chip-info" style="margin-bottom:12px;">🔒 Политика конфиденциальности</div>
+    <h2>Политика конфиденциальности</h2>
+    <h3>1. Собираемые данные</h3><ul><li>Игровой никнейм</li><li>Ответы на вопросы собеседования</li><li>Дата и время прохождения</li><li>Время, затраченное на прохождение</li></ul>
+    <h3>2. Хранение данных</h3><p>Все данные хранятся в локальном хранилище браузера (localStorage). Данные не передаются на внешние серверы.</p>
+    <h3>3. Использование данных</h3><p>Данные используются исключительно для оценки кандидатов. Не передаются третьим лицам.</p>
+    <h3>4. Защита</h3><p>Пароли хешируются перед сохранением. Доступ к данным защищён паролем администратора.</p>
+    <h3>5. Права пользователей</h3><p>Вы вправе запросить удаление данных через официальные каналы игрового проекта.</p>
+  </div>`,
+  rules:`<div class="policy-content">
+    <div class="chip chip-warn" style="margin-bottom:12px;">📋 Правила собеседования</div>
+    <h2>Правила прохождения собеседования</h2>
+    <h3>✅ Общие правила</h3><ul><li>Отвечайте честно и развёрнуто</li><li>Используйте грамотный русский язык</li><li>Не копируйте ответы из интернета</li><li>Не привлекайте третьих лиц к прохождению</li></ul>
+    <h3>⏱ Время</h3><p>На прохождение отводится <strong>45 минут</strong>. Таймер запускается с момента авторизации.</p>
+    <h3>📝 Структура</h3><ul><li>Блок 1: Личная информация (7 вопросов)</li><li>Блок 2: Понимание роли администратора (6 вопросов)</li><li>Блок 3: Регламент и наказания (15 вопросов)</li></ul>
+    <h3>🔒 Важно</h3><ul><li>Код одноразовый — повторный вход невозможен</li><li>Результаты сразу не показываются</li><li>Решение сообщают через официальные каналы</li></ul>
+  </div>`
+};
+function showPolicy(type){S.prevScreen=document.querySelector('.screen.active')?.id;document.getElementById('policy-body').innerHTML=POLICIES[type]||'';showScreen('screen-policy');}
+function closePolicy(){const p=S.prevScreen||'screen-offline';if(p==='screen-admin'){showAdminPanel();}else{showScreen(p);}}
+
+// ═══════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════
+function showAlert(el,msg,cls='alert-danger'){
+  const icons={'alert-danger':'❌','alert-warn':'⚠','alert-success':'✅','alert-info':'ℹ'};
+  el.className='alert '+cls;el.innerHTML=`<span class="alert-icon">${icons[cls]||'•'}</span><span>${msg}</span>`;el.style.display='flex';
+}
+function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtDate(iso){if(!iso)return'—';try{const d=new Date(iso);return d.toLocaleDateString('ru-RU')+' '+d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});}catch{return iso;}}
+function fmtTime(sec){if(!sec&&sec!==0)return'—';return`${Math.floor(sec/60)}м ${sec%60}с`;}
+
+// ripple on button click
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('.btn');if(!btn)return;
+  const r=document.createElement('div');r.className='btn-rpl';
+  const rc=btn.getBoundingClientRect();r.style.left=(e.clientX-rc.left-9)+'px';r.style.top=(e.clientY-rc.top-9)+'px';
+  btn.appendChild(r);setTimeout(()=>r.remove(),500);
+});
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return;
+  const scr=document.querySelector('.screen.active');if(!scr)return;
+  if(scr.id==='screen-login')doLogin();
+  else if(scr.id==='screen-admin-login')doAdminLogin();
+});
+
+// One-time cleanup: remove Test_Test, old data and reset settings cache
+(function(){
+  var toks=DB.tokens().filter(function(t){return t.nick!=='Test_Test';});
+  DB.saveTokens(toks);
+  if(!localStorage.getItem('gap_wiped_v2')){
+    DB.saveResults([]);
+    localStorage.removeItem('gap_cfg'); // clear cached admin password
+    localStorage.setItem('gap_wiped_v2','1');
+  }
+})();
+
+boot();
+</script>
+</body>
+</html>
