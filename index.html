@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════════════
-   DESIGN TOKENS — DARK THEME (default)
+   DESIGN TOKENS - DARK THEME (default)
 ═══════════════════════════════════════════════════ */
 :root,[data-theme="dark"]{
   --bg:#08090f;
@@ -269,7 +269,7 @@ body::after{
 .input-row input{flex:1;}
 
 /* ═══════════════════════════════════════════════════
-   BUTTONS — Premium Glow
+   BUTTONS - Premium Glow
 ═══════════════════════════════════════════════════ */
 .btn{
   position:relative;
@@ -418,7 +418,7 @@ body::after{
 .stat-card .sc-l{font-size:12px;font-weight:500;color:var(--text3);}
 
 /* ═══════════════════════════════════════════════════
-   ADMIN LAYOUT — full screen
+   ADMIN LAYOUT - full screen
 ═══════════════════════════════════════════════════ */
 .admin-layout{display:flex;min-height:100vh;width:100%;}
 .admin-sidebar{
@@ -545,11 +545,12 @@ body::after{
 <!-- ═══════════ OFFLINE ═══════════ -->
 <div class="screen active" id="screen-offline">
   <div class="centered-wrap">
-    <div class="card card-glow card-accent" style="max-width:500px;width:100%;">
+    <div class="card card-glow card-accent" style="max-width:500px;width:100%;position:relative;">
+      <div class="blob-wrap"><div class="blob blob-purple"></div><div class="blob blob-blue"></div></div>
       <div class="scanline"></div>
-      <div class="brand" style="justify-content:center;flex-direction:column;text-align:center;"><div class="brand-icon">🎮</div><div class="brand-text"><h1>Arkhangelsk</h1><p>Система набора администраторов</p></div></div>
-      <div class="offline-hero"><span class="hero-icon">🔴</span><h2>Система неактивна</h2><p>В данный момент обзвоны не проводятся. Следите за объявлениями проекта.</p></div>
-      <div class="footer-links">
+      <div class="brand" style="justify-content:center;flex-direction:column;text-align:center;position:relative;z-index:1;"><div class="brand-icon">🎮</div><div class="brand-text"><h1>Arkhangelsk</h1><p>Система набора администраторов</p></div></div>
+      <div class="offline-hero" style="position:relative;z-index:1;"><span class="hero-icon">🔴</span><h2>Система неактивна</h2><p>В данный момент обзвоны не проводятся. Следите за объявлениями проекта.</p></div>
+      <div class="footer-links" style="position:relative;z-index:1;">
         <a href="#" onclick="showPolicy('terms')">Правила использования</a>
         <a href="#" onclick="showPolicy('privacy')">Конфиденциальность</a>
         <a href="#" onclick="showPolicy('rules')">Правила собеседования</a>
@@ -562,10 +563,11 @@ body::after{
 <!-- ═══════════ LOGIN ═══════════ -->
 <div class="screen" id="screen-login">
   <div class="centered-wrap">
-    <div class="card card-glow card-accent" style="max-width:460px;width:100%;">
+    <div class="card card-glow card-accent" style="max-width:460px;width:100%;position:relative;">
+      <div class="blob-wrap"><div class="blob blob-purple"></div><div class="blob blob-blue"></div><div class="blob blob-pink" style="width:120px;height:120px;"></div></div>
       <div class="scanline"></div>
-      <div class="brand" style="justify-content:center;flex-direction:column;text-align:center;margin-bottom:22px;"><div class="brand-icon">🎮</div><div class="brand-text"><h1>Arkhangelsk</h1><p>Система набора администраторов</p></div></div>
-      <div style="text-align:center;margin-bottom:20px;"><span class="chip chip-online"><span class="chip-dot"></span>Приём заявок открыт</span></div>
+      <div class="brand" style="justify-content:center;flex-direction:column;text-align:center;margin-bottom:22px;position:relative;z-index:1;"><div class="brand-icon">🎮</div><div class="brand-text"><h1>Arkhangelsk</h1><p>Система набора администраторов</p></div></div>
+      <div style="text-align:center;margin-bottom:20px;position:relative;z-index:1;"><span class="chip chip-online"><span class="chip-dot"></span>Приём заявок открыт</span></div>
       <div class="alert alert-info"><span class="alert-icon">🔑</span><span>Введите ваш никнейм и выданный одноразовый код доступа</span></div>
       <div class="form-group"><label>Игровой никнейм</label><input type="text" id="login-nick" placeholder="Ваш никнейм" autocomplete="off"></div>
       <div class="form-group"><label>Код доступа</label><input type="password" id="login-code" placeholder="••••••••" autocomplete="off" maxlength="32"></div>
@@ -624,8 +626,9 @@ body::after{
 <!-- ═══════════ SUCCESS ═══════════ -->
 <div class="screen" id="screen-success">
   <div class="centered-wrap">
-    <div class="card card-glow card-accent" style="max-width:500px;width:100%;">
-      <div class="success-hero">
+    <div class="card card-glow card-accent" style="max-width:500px;width:100%;position:relative;">
+      <div class="blob-wrap"><div class="blob blob-blue"></div><div class="blob blob-purple" style="bottom:-40px;right:-40px;top:auto;left:auto;"></div></div>
+      <div class="success-hero" style="position:relative;z-index:1;">
         <div class="success-circle">✅</div>
         <h2 style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;margin-bottom:12px;letter-spacing:.5px;">Ответы отправлены!</h2>
         <div class="alert alert-success"><span class="alert-icon">📨</span><span>Ваши ответы переданы администрации. Ожидайте решения по результатам собеседования.</span></div>
@@ -635,7 +638,7 @@ body::after{
   </div>
 </div>
 
-<!-- ═══════════ ADMIN PANEL — FULLSCREEN ═══════════ -->
+<!-- ═══════════ ADMIN PANEL - FULLSCREEN ═══════════ -->
 <div class="screen" id="screen-admin" style="display:none;">
   <div class="admin-layout">
     <!-- Sidebar -->
@@ -730,7 +733,7 @@ const DB={
 function hs(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h)^s.charCodeAt(i);return(h>>>0).toString(16);}
 
 // ═══════════════════════════════════════════════════
-// QUESTIONS — correct ones as requested
+// QUESTIONS - correct ones as requested
 // ═══════════════════════════════════════════════════
 const DQ=[
   {id:'b1',title:'Блок 1: Личная информация',qs:[
@@ -740,12 +743,12 @@ const DQ=[
     {id:'q4',text:'Чем занимаетесь?'},
     {id:'q5',text:'Какой у вас часовой пояс от МСК?'},
     {id:'q6',text:'Как давно играете на проекте?'},
-    {id:'q7',text:'Были ли ранее администратором? Если да — опишите опыт.'}
+    {id:'q7',text:'Были ли ранее администратором? Если да - опишите опыт.'}
   ]},
   {id:'b2',title:'Блок 2: Понимание роли администратора',qs:[
     {id:'q8',text:'По вашему мнению, кто такой администратор и чем он занимается?'},
     {id:'q9',text:'Может ли администратор играть в казино?',hint:'Подсказка: подумайте с точки зрения правил проекта'},
-    {id:'q10',text:'Может ли администратор иметь дом?',hint:'Подсказка: имущество — отдельная тема'},
+    {id:'q10',text:'Может ли администратор иметь дом?',hint:'Подсказка: имущество - отдельная тема'},
     {id:'q11',text:'Может ли администратор иметь бизнес?'},
     {id:'q12',text:'Может ли администратор работать на любой работе после рабочего дня при стабильном репорте?'},
     {id:'q13',text:'Может ли администратор добавлять своих друзей во фракции и выдавать им ранги?'}
@@ -824,7 +827,7 @@ function doLogin(){
   const code=document.getElementById('login-code').value.trim();
   const errEl=document.getElementById('login-err');
   if(!nick||!code){showAlert(errEl,'Заполните все поля','alert-warn');return;}
-  const token=DB.tokens().find(t=>t.nick.toLowerCase()===nick.toLowerCase()&&hs(code)===t.codeHash&&t.status==='active');
+  const token=DB.tokens().find(t=>t.nick.toLowerCase()===nick.toLowerCase()&&hs(code.replace(/-/g,''))===t.codeHash&&t.status==='active');
   if(!token){
     BF.inc();
     if(BF.a()>=5){BF.lock(60);BF.reset();startLockUI();return;}
@@ -986,7 +989,7 @@ const CA={
   q23:'Mute 300 min / Ban 30',
   q24:'Jail 30 min',
   q25:'Warn / Ban 3-7',
-  q26:'Ничего — администратор является нрп персонажем',
+  q26:'Ничего - администратор является нрп персонажем',
   q27:'Выдать Абан до выяснения обстоятельств',
   q28:'Да, конечно'
 };
@@ -994,7 +997,7 @@ const CA={
 // Fuzzy match correct answer
 function checkAnswer(qid, ans){
   const correct=CA[qid];
-  if(!correct)return null; // no correct answer defined — open question
+  if(!correct)return null; // no correct answer defined - open question
   const a=ans.toLowerCase().replace(/[^а-яa-z0-9\s]/gi,'').trim();
   const c=correct.toLowerCase().replace(/[^а-яa-z0-9\s]/gi,'').trim();
   // check if key words present
@@ -1036,7 +1039,7 @@ function rdDash(p){
         <div class="section-title" style="font-size:15px;">🔴 Статус системы</div>
         <div class="alert ${c.active?'alert-success':'alert-danger'}">
           <span class="alert-icon">${c.active?'✅':'🔴'}</span>
-          <span>${c.active?'Сайт активен — приём заявок открыт':'Сайт отключён — обзвоны не проводятся'}</span>
+          <span>${c.active?'Сайт активен - приём заявок открыт':'Сайт отключён - обзвоны не проводятся'}</span>
         </div>
       </div>
     </div>`;
@@ -1170,10 +1173,10 @@ function rdAccess(p){
         <table class="data-table"><thead><tr><th>Никнейм</th><th>Код</th><th>Статус</th><th>Создан</th><th>Использован</th><th>Заметка</th><th>Действия</th></tr></thead>
         <tbody>${toks.length?toks.slice().reverse().map(t=>`<tr>
           <td><strong>${escH(t.nick)}</strong></td>
-          <td><span class="mono orange" style="font-size:12px;">${escH(t.rawCode||'—')}</span></td>
+          <td><span class="mono orange" style="font-size:12px;">${escH(t.rawCode||'-')}</span></td>
           <td><span class="tag tag-${t.status==='active'?'active':'used'}">${t.status==='active'?'АКТИВЕН':'ИСПОЛЬЗОВАН'}</span></td>
           <td style="font-size:12px;color:var(--text3);">${fmtDate(t.createdAt)}</td>
-          <td style="font-size:12px;color:var(--text3);">${t.usedAt?fmtDate(t.usedAt):'—'}</td>
+          <td style="font-size:12px;color:var(--text3);">${t.usedAt?fmtDate(t.usedAt):'-'}</td>
           <td style="font-size:12px;color:var(--text3);">${escH(t.note||'')}</td>
           <td><div class="flex gap-8">${t.status==='active'?`<button class="btn btn-danger btn-sm" onclick="revokeToken('${t.id}')">Отозвать</button>`:''}<button class="btn btn-ghost btn-sm" onclick="deleteToken('${t.id}')">✕</button></div></td>
         </tr>`).join(''):'<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3);">Нет токенов</td></tr>'}</tbody></table>
@@ -1298,7 +1301,7 @@ function rdTable(p){
               const ans=(r.answers[q.id]||'').trim();
               const ok=CA[q.id]&&ans.length>1?checkAnswer(q.id,ans):null;
               const bg=ok===true?'rgba(0,212,138,.08)':ok===false?'rgba(255,64,96,.08)':'';
-              return`<td style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:${bg};" title="${escH(ans)}">${escH((ans||'—').substring(0,60))}${ans.length>60?'…':''}</td>`;
+              return`<td style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:${bg};" title="${escH(ans)}">${escH((ans||'-').substring(0,60))}${ans.length>60?'…':''}</td>`;
             }).join('')}
           </tr>`;}).join('')}
       </tbody></table></div>`:`<div class="alert alert-info"><span class="alert-icon">ℹ</span><span>Нет завершённых собеседований</span></div>`}
@@ -1375,11 +1378,14 @@ function saveAdminPass(){
 function exportCSV(){
   const res=DB.results(),qs=DB.questions();
   const allQs=[];qs.forEach(b=>b.qs.forEach(q=>allQs.push(q)));
-  let csv='ID,Никнейм,Дата,Статус,Время,'+allQs.map(q=>'"'+q.text.replace(/"/g,'""')+'"').join(',')+'\n';
-  res.forEach(r=>{csv+=`${r.id},${r.nick},${r.date},${r.status},${fmtTime(r.timeSpent)},`+allQs.map(q=>'"'+(r.answers[q.id]||'').replace(/"/g,'""')+'"').join(',')+'\n';});
-  dl('results.csv',csv,'text/csv');
+  const sep=';';
+  const esc=v=>'"'+String(v||'').replace(/"/g,'""').replace(/\n/g,' ').replace(/\r/g,'')+'"';
+  const header=[['ID','Никнейм','Дата','Статус','Время (сек)',...allQs.map(q=>q.text)].map(esc).join(sep)];
+  const rows=res.map(r=>[r.id,r.nick,r.date,r.status,r.timeSpent||0,...allQs.map(q=>r.answers[q.id]||'')].map(esc).join(sep));
+  const bom='\uFEFF';
+  dl('results.csv',bom+[...header,...rows].join('\r\n'),'text/csv;charset=utf-8;');
 }
-function exportJSON(){dl('results.json',JSON.stringify(DB.results(),null,2),'application/json');}
+function exportJSON(){dl('results.json',JSON.stringify(DB.results(),null,2),'application/json;charset=utf-8;');}
 function dl(n,c,t){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=n;a.click();}
 
 // ═══════════════════════════════════════════════════
@@ -1390,7 +1396,7 @@ const POLICIES={
     <div class="chip chip-info" style="margin-bottom:12px;">📜 Правила использования</div>
     <h2>Правила использования портала</h2>
     <p style="color:var(--text3);margin-bottom:16px;">Используя портал, вы принимаете настоящие Правила.</p>
-    <h3>1. Общие положения</h3><p>Arkhangelsk — система проведения онлайн-собеседований для кандидатов на должность администратора игрового проекта.</p>
+    <h3>1. Общие положения</h3><p>Arkhangelsk - система проведения онлайн-собеседований для кандидатов на должность администратора игрового проекта.</p>
     <h3>2. Доступ к системе</h3><p>Доступ предоставляется исключительно кандидатам с персональным одноразовым кодом. Передача кода третьим лицам запрещена.</p>
     <h3>3. Запрещённые действия</h3><ul><li>Предоставление заведомо ложной информации</li><li>Использование чужого кода доступа</li><li>Попытки взлома или обхода системы защиты</li><li>Более 5 неверных попыток входа</li></ul>
     <h3>4. Временные ограничения</h3><p>На прохождение отводится 45 минут. По истечении времени ответы сохраняются автоматически.</p>
@@ -1412,7 +1418,7 @@ const POLICIES={
     <h3>✅ Общие правила</h3><ul><li>Отвечайте честно и развёрнуто</li><li>Используйте грамотный русский язык</li><li>Не копируйте ответы из интернета</li><li>Не привлекайте третьих лиц к прохождению</li></ul>
     <h3>⏱ Время</h3><p>На прохождение отводится <strong>45 минут</strong>. Таймер запускается с момента авторизации.</p>
     <h3>📝 Структура</h3><ul><li>Блок 1: Личная информация (7 вопросов)</li><li>Блок 2: Понимание роли администратора (6 вопросов)</li><li>Блок 3: Регламент и наказания (15 вопросов)</li></ul>
-    <h3>🔒 Важно</h3><ul><li>Код одноразовый — повторный вход невозможен</li><li>Результаты сразу не показываются</li><li>Решение сообщают через официальные каналы</li></ul>
+    <h3>🔒 Важно</h3><ul><li>Код одноразовый - повторный вход невозможен</li><li>Результаты сразу не показываются</li><li>Решение сообщают через официальные каналы</li></ul>
   </div>`
 };
 function showPolicy(type){S.prevScreen=document.querySelector('.screen.active')?.id;document.getElementById('policy-body').innerHTML=POLICIES[type]||'';showScreen('screen-policy');}
@@ -1426,8 +1432,8 @@ function showAlert(el,msg,cls='alert-danger'){
   el.className='alert '+cls;el.innerHTML=`<span class="alert-icon">${icons[cls]||'•'}</span><span>${msg}</span>`;el.style.display='flex';
 }
 function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function fmtDate(iso){if(!iso)return'—';try{const d=new Date(iso);return d.toLocaleDateString('ru-RU')+' '+d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});}catch{return iso;}}
-function fmtTime(sec){if(!sec&&sec!==0)return'—';return`${Math.floor(sec/60)}м ${sec%60}с`;}
+function fmtDate(iso){if(!iso)return'-';try{const d=new Date(iso);return d.toLocaleDateString('ru-RU')+' '+d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});}catch{return iso;}}
+function fmtTime(sec){if(!sec&&sec!==0)return'-';return`${Math.floor(sec/60)}м ${sec%60}с`;}
 
 // ripple on button click
 document.addEventListener('click',e=>{
