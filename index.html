@@ -895,7 +895,9 @@ const DQ=[
     {id:'q13',text:'Может ли администратор добавлять своих друзей во фракции и выдавать им ранги?'}
   ]},
   {id:'b3',title:'Блок 3: Регламент и наказания',qs:[
-    {id:'q14',text:'Какое наказание выдаётся за ДМ, ДБ, ТК?'},
+    {id:'q14',text:'Какое наказание выдаётся за ДМ (DeathMatch)?'},
+    {id:'q14b',text:'Какое наказание выдаётся за ДБ (DriveBy)?'},
+    {id:'q14c',text:'Какое наказание выдаётся за ТК (TeamKill)?'},
     {id:'q15',text:'Какое наказание выдаётся за CapsLock?'},
     {id:'q16',text:'Какое наказание даётся за NonRP Обман?'},
     {id:'q17',text:'Какое наказание выдаётся за обман администрации?'},
@@ -1122,6 +1124,8 @@ const CA={
   q12:'Нет, запрещено работать на любых работах',
   q13:'Запрещено',
   q14:'Jail 60 min',
+  q14b:'Jail 60 min',
+  q14c:'Jail 60 min',
   q15:'Mute 30 min',
   q16:'Permban',
   q17:'Ban 7-15',
@@ -1138,16 +1142,64 @@ const CA={
   q28:'Да, конечно'
 };
 
-// Fuzzy match correct answer
+// Smart semantic answer checker
 function checkAnswer(qid, ans){
   const correct=CA[qid];
-  if(!correct)return null; // no correct answer defined - open question
-  const a=ans.toLowerCase().replace(/[^а-яa-z0-9\s]/gi,'').trim();
-  const c=correct.toLowerCase().replace(/[^а-яa-z0-9\s]/gi,'').trim();
-  // check if key words present
-  const keywords=c.split(/\s+/).filter(w=>w.length>2);
-  const matched=keywords.filter(w=>a.includes(w));
-  return matched.length>=Math.ceil(keywords.length*0.6);
+  if(!correct)return null; // open question - no etalon
+
+  // Normalize: lowercase, trim
+  let a = ans.toLowerCase().trim();
+  let c = correct.toLowerCase().trim();
+
+  // ── Transliteration map: russian gaming terms <-> latin equivalents ──
+  const trans = [
+    // Punishment terms
+    [/мьют|мут|mute/g,           'mute'],
+    [/джейл|jail/g,              'jail'],
+    [/бан|ban/g,                 'ban'],
+    [/варн|warn/g,               'warn'],
+    [/пермбан|permban/g,         'permban'],
+    [/абан|aban/g,               'aban'],
+    // Time
+    [/минут|минуты|мин|min/g,'min'],
+    // Logical synonyms
+    [/нет|не может|запрещено|запрещён|нельзя|не разрешено|не допускается/g, 'запрещено'],
+    [/да|может|разрешено|можно|допускается/g, 'да'],
+    [/ничего|ничего не делать|не делать|игнорировать/g, 'ничего'],
+    [/нрп|нон рп|nonrp|non-rp|non rp/g, 'нрп'],
+    [/абан до выяснения|абан на выяснение|заблокировать до выяснения/g, 'абан до выяснения'],
+    // Numbers: words to digits and back
+    [/тридцать|30/g, '30'],
+    [/шестьдесят|60/g, '60'],
+    [/сто двадцать|120/g, '120'],
+    [/сто восемьдесят|180/g, '180'],
+    [/триста|300/g, '300'],
+  ];
+
+  function normalize(str){
+    let s = str;
+    trans.forEach(([rx,rep])=>{ s = s.replace(rx, rep); });
+    // Remove punctuation except digits/letters
+    s = s.replace(/[^\wа-яё0-9\s]/gi,' ').replace(/\s+/g,' ').trim();
+    return s;
+  }
+
+  const na = normalize(a);
+  const nc = normalize(c);
+
+  // Exact match after normalization
+  if(na === nc) return true;
+
+  // Check if key semantic tokens all present
+  const keywords = nc.split(/\s+/).filter(w=>w.length>1);
+  if(keywords.length === 0) return null;
+  const matched = keywords.filter(w => na.includes(w));
+  const ratio = matched.length / keywords.length;
+
+  // For very short answers (1-2 words), require 100% match
+  if(keywords.length <= 2) return ratio === 1.0;
+  // For longer answers, require 70%
+  return ratio >= 0.7;
 }
 
 // ═══════════════════════════════════════════════════
