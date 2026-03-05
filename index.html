@@ -156,7 +156,20 @@ body::after{
 .centered-wrap{
   min-height:100vh;display:flex;align-items:center;justify-content:center;
   padding:24px 16px;
+  background:#000000;
+  --gap:5em;--line:1px;--color:rgba(255,255,255,0.15);
+  background-image:
+    linear-gradient(-90deg,transparent calc(var(--gap) - var(--line)),var(--color) calc(var(--gap) - var(--line) + 1px),var(--color) var(--gap)),
+    linear-gradient(0deg,transparent calc(var(--gap) - var(--line)),var(--color) calc(var(--gap) - var(--line) + 1px),var(--color) var(--gap));
+  background-size:var(--gap) var(--gap);
+  position:relative;
 }
+/* subtle radial vignette over grid */
+.centered-wrap::before{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 80% 70% at 50% 50%,transparent 40%,rgba(0,0,0,.7) 100%);
+}
+.centered-wrap>*{position:relative;z-index:1;}
 
 /* ═══════════════════════════════════════════════════
    CARD
@@ -171,7 +184,7 @@ body::after{
   transition:background .3s,border-color .3s,box-shadow .3s;
   animation:neonFlicker 12s infinite;
 }
-/* rotating glow border */
+/* rotating glow border (admin panel cards) */
 .card-glow::before{
   content:'';position:absolute;inset:-1px;
   border-radius:calc(var(--radius)+1px);
@@ -195,6 +208,56 @@ body::after{
   content:'';position:absolute;top:0;left:0;right:0;height:3px;
   background:linear-gradient(90deg,var(--orange),var(--blue),var(--orange2));
   border-radius:var(--radius) var(--radius) 0 0;z-index:1;
+}
+
+/* ═══ PORTAL CARD (login / offline screens) ═══ */
+.card-portal{
+  background:transparent !important;
+  border:none !important;
+  box-shadow:none !important;
+  padding:0 !important;
+  animation:none !important;
+  overflow:visible !important;
+}
+.card-portal .card-inner{
+  position:relative;
+  width:100%;
+  border-radius:var(--radius);
+  overflow:hidden;
+  z-index:1;
+}
+/* gradient border glow */
+.card-portal .card-inner::before{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(315deg,#03a9f4,#ff0058);
+  border-radius:var(--radius);
+  z-index:0;
+}
+/* blurred glow behind card */
+.card-portal .card-inner::after{
+  content:'';
+  position:absolute;inset:-4px;
+  background:linear-gradient(315deg,#03a9f4,#ff0058);
+  filter:blur(32px);
+  border-radius:var(--radius);
+  z-index:-1;
+  opacity:.7;
+  animation:glowPulse 3s ease-in-out infinite;
+}
+/* dark inner surface */
+.card-portal .card-body{
+  position:relative;
+  background:rgba(0,0,0,.82);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-radius:calc(var(--radius) - 2px);
+  margin:3px;
+  padding:36px 40px;
+  z-index:1;
+}
+@media(max-width:560px){
+  .card-portal .card-body{padding:24px 18px;}
 }
 
 /* ═══════════════════════════════════════════════════
@@ -545,16 +608,19 @@ body::after{
 <!-- ═══════════ OFFLINE ═══════════ -->
 <div class="screen active" id="screen-offline">
   <div class="centered-wrap">
-    <div class="card card-glow card-accent" style="max-width:500px;width:100%;position:relative;">
-      <div class="blob-wrap"><div class="blob blob-purple"></div><div class="blob blob-blue"></div></div>
-      <div class="scanline"></div>
-      <div class="brand" style="justify-content:center;flex-direction:column;text-align:center;position:relative;z-index:1;"><div class="brand-icon">🎮</div><div class="brand-text"><h1>Arkhangelsk</h1><p>Система набора администраторов</p></div></div>
-      <div class="offline-hero" style="position:relative;z-index:1;"><span class="hero-icon">🔴</span><h2>Система неактивна</h2><p>В данный момент обзвоны не проводятся. Следите за объявлениями проекта.</p></div>
-      <div class="footer-links" style="position:relative;z-index:1;">
-        <a href="#" onclick="showPolicy('terms')">Правила использования</a>
-        <a href="#" onclick="showPolicy('privacy')">Конфиденциальность</a>
-        <a href="#" onclick="showPolicy('rules')">Правила собеседования</a>
-        <a href="#" onclick="showAdminLogin()" style="opacity:.3;font-size:11px;">⚙ Админ</a>
+    <div class="card card-portal" style="max-width:500px;width:100%;">
+      <div class="card-inner">
+        <div class="card-body">
+          <div class="scanline"></div>
+          <div class="brand" style="justify-content:center;flex-direction:column;text-align:center;"><div class="brand-icon">🎮</div><div class="brand-text"><h1>Arkhangelsk</h1><p>Система набора администраторов</p></div></div>
+          <div class="offline-hero"><span class="hero-icon">🔴</span><h2>Система неактивна</h2><p>В данный момент обзвоны не проводятся. Следите за объявлениями проекта.</p></div>
+          <div class="footer-links">
+            <a href="#" onclick="showPolicy('terms')">Правила использования</a>
+            <a href="#" onclick="showPolicy('privacy')">Конфиденциальность</a>
+            <a href="#" onclick="showPolicy('rules')">Правила собеседования</a>
+            <a href="#" onclick="showAdminLogin()" style="opacity:.3;font-size:11px;">⚙ Админ</a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -563,22 +629,25 @@ body::after{
 <!-- ═══════════ LOGIN ═══════════ -->
 <div class="screen" id="screen-login">
   <div class="centered-wrap">
-    <div class="card card-glow card-accent" style="max-width:460px;width:100%;position:relative;">
-      <div class="blob-wrap"><div class="blob blob-purple"></div><div class="blob blob-blue"></div><div class="blob blob-pink" style="width:120px;height:120px;"></div></div>
-      <div class="scanline"></div>
-      <div class="brand" style="justify-content:center;flex-direction:column;text-align:center;margin-bottom:22px;position:relative;z-index:1;"><div class="brand-icon">🎮</div><div class="brand-text"><h1>Arkhangelsk</h1><p>Система набора администраторов</p></div></div>
-      <div style="text-align:center;margin-bottom:20px;position:relative;z-index:1;"><span class="chip chip-online"><span class="chip-dot"></span>Приём заявок открыт</span></div>
-      <div class="alert alert-info"><span class="alert-icon">🔑</span><span>Введите ваш никнейм и выданный одноразовый код доступа</span></div>
-      <div class="form-group"><label>Игровой никнейм</label><input type="text" id="login-nick" placeholder="Ваш никнейм" autocomplete="off"></div>
-      <div class="form-group"><label>Код доступа</label><input type="password" id="login-code" placeholder="••••••••" autocomplete="off" maxlength="32"></div>
-      <div id="login-err" class="alert alert-danger" style="display:none;"></div>
-      <div id="login-locked" class="alert alert-warn" style="display:none;"><span class="alert-icon">⏳</span><span>Много попыток. Подождите <strong id="lock-cd">30</strong> сек.</span></div>
-      <button class="btn btn-orange btn-full mt-16" id="login-btn" onclick="doLogin()">Войти в систему <span class="btn-icon">→</span></button>
-      <div class="footer-links" style="margin-top:12px;">
-        <a href="#" onclick="showPolicy('terms')">Правила</a>
-        <a href="#" onclick="showPolicy('privacy')">Конфиденциальность</a>
-        <a href="#" onclick="showPolicy('rules')">Правила собеседования</a>
-        <a href="#" onclick="showAdminLogin()" style="opacity:.3;font-size:11px;">⚙ Админ</a>
+    <div class="card card-portal" style="max-width:460px;width:100%;">
+      <div class="card-inner">
+        <div class="card-body">
+          <div class="scanline"></div>
+          <div class="brand" style="justify-content:center;flex-direction:column;text-align:center;margin-bottom:22px;"><div class="brand-icon">🎮</div><div class="brand-text"><h1>Arkhangelsk</h1><p>Система набора администраторов</p></div></div>
+          <div style="text-align:center;margin-bottom:20px;"><span class="chip chip-online"><span class="chip-dot"></span>Приём заявок открыт</span></div>
+          <div class="alert alert-info"><span class="alert-icon">🔑</span><span>Введите ваш никнейм и выданный одноразовый код доступа</span></div>
+          <div class="form-group"><label>Игровой никнейм</label><input type="text" id="login-nick" placeholder="Ваш никнейм" autocomplete="off"></div>
+          <div class="form-group"><label>Код доступа</label><input type="password" id="login-code" placeholder="••••••••" autocomplete="off" maxlength="32"></div>
+          <div id="login-err" class="alert alert-danger" style="display:none;"></div>
+          <div id="login-locked" class="alert alert-warn" style="display:none;"><span class="alert-icon">⏳</span><span>Много попыток. Подождите <strong id="lock-cd">30</strong> сек.</span></div>
+          <button class="btn btn-orange btn-full mt-16" id="login-btn" onclick="doLogin()">Войти в систему <span class="btn-icon">→</span></button>
+          <div class="footer-links" style="margin-top:12px;">
+            <a href="#" onclick="showPolicy('terms')">Правила</a>
+            <a href="#" onclick="showPolicy('privacy')">Конфиденциальность</a>
+            <a href="#" onclick="showPolicy('rules')">Правила собеседования</a>
+            <a href="#" onclick="showAdminLogin()" style="opacity:.3;font-size:11px;">⚙ Админ</a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -587,13 +656,17 @@ body::after{
 <!-- ═══════════ ADMIN LOGIN ═══════════ -->
 <div class="screen" id="screen-admin-login">
   <div class="centered-wrap">
-    <div class="card card-glow card-accent" style="max-width:380px;width:100%;">
-      <div class="scanline"></div>
-      <div class="brand"><div class="brand-icon" style="background:linear-gradient(135deg,#444,#222);">⚙</div><div class="brand-text"><h1>Панель администратора</h1><p>Ограниченный доступ</p></div></div>
-      <div class="alert alert-warn"><span class="alert-icon">⚠</span><span>Только для администраторов системы</span></div>
-      <div class="form-group"><label>Пароль администратора</label><input type="password" id="admin-pass" placeholder="••••••••" autocomplete="off"></div>
-      <div id="admin-login-err" class="alert alert-danger" style="display:none;"></div>
-      <div class="flex gap-8 mt-16"><button class="btn btn-outline" onclick="goBack()">← Назад</button><button class="btn btn-orange" style="flex:1;" onclick="doAdminLogin()">Войти <span class="btn-icon">→</span></button></div>
+    <div class="card card-portal" style="max-width:380px;width:100%;">
+      <div class="card-inner">
+        <div class="card-body">
+          <div class="scanline"></div>
+          <div class="brand"><div class="brand-icon" style="background:linear-gradient(135deg,#444,#222);">⚙</div><div class="brand-text"><h1>Панель администратора</h1><p>Ограниченный доступ</p></div></div>
+          <div class="alert alert-warn"><span class="alert-icon">⚠</span><span>Только для администраторов системы</span></div>
+          <div class="form-group"><label>Пароль администратора</label><input type="password" id="admin-pass" placeholder="••••••••" autocomplete="off"></div>
+          <div id="admin-login-err" class="alert alert-danger" style="display:none;"></div>
+          <div class="flex gap-8 mt-16"><button class="btn btn-outline" onclick="goBack()">← Назад</button><button class="btn btn-orange" style="flex:1;" onclick="doAdminLogin()">Войти <span class="btn-icon">→</span></button></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -626,13 +699,17 @@ body::after{
 <!-- ═══════════ SUCCESS ═══════════ -->
 <div class="screen" id="screen-success">
   <div class="centered-wrap">
-    <div class="card card-glow card-accent" style="max-width:500px;width:100%;position:relative;">
-      <div class="blob-wrap"><div class="blob blob-blue"></div><div class="blob blob-purple" style="bottom:-40px;right:-40px;top:auto;left:auto;"></div></div>
-      <div class="success-hero" style="position:relative;z-index:1;">
-        <div class="success-circle">✅</div>
-        <h2 style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;margin-bottom:12px;letter-spacing:.5px;">Ответы отправлены!</h2>
-        <div class="alert alert-success"><span class="alert-icon">📨</span><span>Ваши ответы переданы администрации. Ожидайте решения по результатам собеседования.</span></div>
-        <p class="text-sm" style="margin-top:12px;line-height:1.8;">Ваш одноразовый код деактивирован. Повторный вход невозможен.<br>Результаты сообщат через официальные каналы проекта.</p>
+    <div class="card card-portal" style="max-width:500px;width:100%;">
+      <div class="card-inner">
+        <div class="card-body">
+          <div class="scanline"></div>
+          <div class="success-hero">
+            <div class="success-circle">✅</div>
+            <h2 style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;margin-bottom:12px;letter-spacing:.5px;">Ответы отправлены!</h2>
+            <div class="alert alert-success"><span class="alert-icon">📨</span><span>Ваши ответы переданы администрации. Ожидайте решения по результатам собеседования.</span></div>
+            <p class="text-sm" style="margin-top:12px;line-height:1.8;">Ваш одноразовый код деактивирован. Повторный вход невозможен.<br>Результаты сообщат через официальные каналы проекта.</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -656,6 +733,7 @@ body::after{
       <div class="nav-item" id="nav-table" onclick="adminTab('table')"><span class="nav-icon">📋</span> Общая таблица</div>
       <div class="nav-item" id="nav-questions" onclick="adminTab('questions')"><span class="nav-icon">❓</span> Вопросы</div>
       <div class="nav-section">Система</div>
+      <div class="nav-item" onclick="fbLoadAll().then(()=>adminTab('dash'))" style="font-size:12px;"><span class="nav-icon">🔄</span> Обновить данные</div>
       <div style="padding:6px 10px;">
         <div class="toggle-row">
           <label class="toggle"><input type="checkbox" id="site-toggle" onchange="toggleSite()"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
@@ -665,6 +743,7 @@ body::after{
       <div class="nav-item" id="nav-settings" onclick="adminTab('settings')"><span class="nav-icon">🔒</span> Настройки</div>
       <div style="flex:1;"></div>
       <div class="divider" style="margin:8px 0;"></div>
+      <div style="font-size:11px;color:var(--text3);text-align:center;padding:4px 0;" id="fb-status">🔄 Подключение...</div>
       <button class="btn btn-danger btn-sm btn-full" onclick="adminLogout()">🚪 Выйти</button>
     </aside>
     <!-- Main -->
@@ -695,10 +774,11 @@ body::after{
 
 <script>
 // ═══════════════════════════════════════════════════
-// SITE DEFAULT STATE (change to true to open by default for all devices)
-// When admin toggles via admin panel on their device, it overrides this
-// for candidates on OTHER devices, set this to true after enabling in admin panel
-const SITE_DEFAULT_ACTIVE = true;
+// ═══════════════════════════════════════════════════
+// FIREBASE CONFIG — вставь свои данные сюда
+// ═══════════════════════════════════════════════════
+const FB_URL = 'https://obzvon-99679-default-rtdb.europe-west1.firebasedatabase.app'; // пример: https://arkhangelsk-default-rtdb.europe-west1.firebasedatabase.app
+
 // ═══════════════════════════════════════════════════
 // THEME
 // ═══════════════════════════════════════════════════
@@ -716,21 +796,82 @@ function toggleTheme(){
 })();
 
 // ═══════════════════════════════════════════════════
-// DB
+// FIREBASE DB — все данные хранятся в облаке
 // ═══════════════════════════════════════════════════
-const DB={
-  _g(k){try{return JSON.parse(localStorage.getItem('gap_'+k));}catch{return null;}},
-  _s(k,v){localStorage.setItem('gap_'+k,JSON.stringify(v));},
-  settings(){return this._g('cfg')||{active:SITE_DEFAULT_ACTIVE,adminHash:hs('Ark#9mX$vQ2!')};},
-  saveSettings(v){this._s('cfg',v);},
-  tokens(){return this._g('tok')||[];},
-  saveTokens(v){this._s('tok',v);},
-  results(){return this._g('res')||[];},
-  saveResults(v){this._s('res',v);},
-  questions(){return this._g('qs')||DQ;},
-  saveQuestions(v){this._s('qs',v);}
-};
 function hs(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h)^s.charCodeAt(i);return(h>>>0).toString(16);}
+
+// In-memory cache (loaded once at boot)
+let _cache = {cfg:null, tok:null, res:null, qs:null};
+let _fbReady = false;
+let _bootCb = null;
+
+async function fbGet(path){
+  try{
+    const r = await fetch(FB_URL+'/'+path+'.json');
+    if(!r.ok) throw new Error('fb get failed');
+    return await r.json();
+  }catch(e){console.warn('fbGet error',e);return null;}
+}
+async function fbSet(path, data){
+  try{
+    const r = await fetch(FB_URL+'/'+path+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    return r.ok;
+  }catch(e){console.warn('fbSet error',e);return false;}
+}
+
+async function fbLoadAll(){
+  showLoading(true);
+  try{
+    const data = await fbGet('');
+    _cache.cfg  = data?.cfg  || {active:false, adminHash:hs('Ark#9mX$vQ2!')};
+    _cache.tok  = data?.tok  ? Object.values(data.tok) : [];
+    _cache.res  = data?.res  ? Object.values(data.res) : [];
+    _cache.qs   = data?.qs   || null;
+    _fbReady = true;
+  const fbs=document.getElementById('fb-status');if(fbs)fbs.innerHTML='🟢 Firebase OK';
+  }catch(e){
+    console.warn('Firebase load error, using localStorage fallback',e);
+    const fbs=document.getElementById('fb-status');if(fbs)fbs.innerHTML='🔴 Офлайн режим';
+    _cache.cfg  = JSON.parse(localStorage.getItem('gap_cfg')||'null') || {active:false,adminHash:hs('Ark#9mX$vQ2!')};
+    _cache.tok  = JSON.parse(localStorage.getItem('gap_tok')||'[]');
+    _cache.res  = JSON.parse(localStorage.getItem('gap_res')||'[]');
+    _cache.qs   = JSON.parse(localStorage.getItem('gap_qs')||'null');
+    _fbReady = true;
+  }
+  showLoading(false);
+}
+
+function showLoading(show){
+  let el = document.getElementById('fb-loading');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'fb-loading';
+    el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;';
+    el.innerHTML='<div style="width:48px;height:48px;border:3px solid rgba(242,100,25,.3);border-top-color:#f26419;border-radius:50%;animation:spin 1s linear infinite;"></div><div style="color:#f26419;font-family:Rajdhani,sans-serif;font-size:20px;font-weight:700;letter-spacing:2px;">ЗАГРУЗКА...</div>';
+    document.body.appendChild(el);
+  }
+  el.style.display = show ? 'flex' : 'none';
+}
+
+const DB={
+  settings(){return _cache.cfg||{active:false,adminHash:hs('Ark#9mX$vQ2!')};},
+  async saveSettings(v){_cache.cfg=v;await fbSet('cfg',v);},
+  tokens(){return _cache.tok||[];},
+  async saveTokens(v){
+    _cache.tok=v;
+    // Store as object keyed by id for Firebase
+    const obj={};v.forEach(t=>{obj[t.id]=t;});
+    await fbSet('tok',obj);
+  },
+  results(){return _cache.res||[];},
+  async saveResults(v){
+    _cache.res=v;
+    const obj={};v.forEach(r=>{obj[r.id]=r;});
+    await fbSet('res',obj);
+  },
+  questions(){return _cache.qs||DQ;},
+  async saveQuestions(v){_cache.qs=v;await fbSet('qs',v);}
+};
 
 // ═══════════════════════════════════════════════════
 // QUESTIONS - correct ones as requested
@@ -795,7 +936,8 @@ function showScreen(id){
   const el=document.getElementById(id);
   if(el){el.classList.add('active');}
 }
-function boot(){
+async function boot(){
+  await fbLoadAll();
   const c=DB.settings();
   const tog=document.getElementById('site-toggle');
   if(tog)tog.checked=c.active;
@@ -810,7 +952,7 @@ function boot(){
   if(c.active && restoreInterview()) return;
   showScreen(c.active?'screen-login':'screen-offline');
 }
-function goBack(){showScreen(DB.settings().active?'screen-login':'screen-offline');}
+function goBack(){const c=DB.settings();showScreen(c.active?'screen-login':'screen-offline');}
 function showAdminLogin(){
   S.prevScreen=document.querySelector('.screen.active')?.id;
   document.getElementById('admin-pass').value='';
@@ -908,12 +1050,12 @@ function submitInterview(){
 function saveResult(auto){
   const r=DB.results();
   r.push({id:'r'+Date.now(),nick:S.user.nick,tokenId:S.user.tokenId,date:new Date().toISOString(),answers:{...S.answers},status:'pending',timeSpent:S.timerTotal-S.timerSec,autoSubmit:!!auto});
-  DB.saveResults(r);
+  DB.saveResults(r); // async fire-and-forget
 }
 function deactivateToken(id){
   const t=DB.tokens(),tk=t.find(t=>t.id===id);
   if(tk){tk.status='used';tk.usedAt=new Date().toISOString();}
-  DB.saveTokens(t);
+  DB.saveTokens(t); // async fire-and-forget
 }
 
 // ═══════════════════════════════════════════════════
@@ -935,21 +1077,23 @@ function renderTimer(){
 // ═══════════════════════════════════════════════════
 // ADMIN
 // ═══════════════════════════════════════════════════
-function doAdminLogin(){
+async function doAdminLogin(){
   const pass=document.getElementById('admin-pass').value;
   if(hs(pass)===DB.settings().adminHash){
     sessionStorage.setItem('gap_admin','1');
-    showAdminPanel();
+    await showAdminPanel();
   } else showAlert(document.getElementById('admin-login-err'),'Неверный пароль','alert-danger');
 }
 function adminLogout(){
   sessionStorage.removeItem('gap_admin');
   goBack();
 }
-function showAdminPanel(){
+async function showAdminPanel(){
   const el=document.getElementById('screen-admin');
   document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='';});
   el.classList.add('active');el.style.display='block';
+  // Refresh from Firebase each time admin panel opens
+  await fbLoadAll();
   const c=DB.settings();
   document.getElementById('site-toggle').checked=c.active;
   document.getElementById('site-label').textContent=c.active?'ONLINE':'OFFLINE';
@@ -1196,12 +1340,14 @@ function createToken(){
   const toks=DB.tokens();
   if(toks.find(t=>t.nick.toLowerCase()===nick.toLowerCase()&&t.status==='active')){showAlert(msg,'У кандидата уже есть активный токен','alert-warn');return;}
   toks.push({id:'t'+Date.now(),nick,codeHash:hs(code.replace(/-/g,'')),rawCode:code,status:'active',createdAt:new Date().toISOString(),usedAt:null,note});
-  DB.saveTokens(toks);_gc='';
-  showAlert(msg,`Доступ создан для ${nick}. Код: ${code}`,'alert-success');
-  setTimeout(()=>rdAccess(document.getElementById('admin-content')),1500);
+  DB.saveTokens(toks).then(()=>{
+    _gc='';
+    showAlert(msg,`Доступ создан для ${nick}. Код: ${code}`,'alert-success');
+    setTimeout(()=>rdAccess(document.getElementById('admin-content')),1200);
+  });
 }
-function revokeToken(id){if(!confirm('Отозвать токен?'))return;const t=DB.tokens(),tk=t.find(t=>t.id===id);if(tk){tk.status='used';tk.usedAt=new Date().toISOString();}DB.saveTokens(t);rdAccess(document.getElementById('admin-content'));}
-function deleteToken(id){if(!confirm('Удалить?'))return;DB.saveTokens(DB.tokens().filter(t=>t.id!==id));rdAccess(document.getElementById('admin-content'));}
+function revokeToken(id){if(!confirm('Отозвать токен?'))return;const t=DB.tokens(),tk=t.find(t=>t.id===id);if(tk){tk.status='used';tk.usedAt=new Date().toISOString();}DB.saveTokens(t).then(()=>rdAccess(document.getElementById('admin-content')));}
+function deleteToken(id){if(!confirm('Удалить?'))return;DB.saveTokens(DB.tokens().filter(t=>t.id!==id)).then(()=>rdAccess(document.getElementById('admin-content')));}
 
 // ═══════════════════════════════════════════════════
 // TAB: ANSWERS
@@ -1316,7 +1462,7 @@ function rdQuestions(p){
   p.innerHTML=`
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:20px;">
       <div class="section-title" style="margin:0;font-size:20px;">❓ Редактор вопросов</div>
-      <div class="flex gap-8"><button class="btn btn-orange btn-sm" onclick="addBlock()">+ Блок</button><button class="btn btn-success btn-sm" onclick="showAlert(document.getElementById('qs-msg'),'Вопросы сохранены','alert-success')">💾 Сохранить</button></div>
+      <div class="flex gap-8"><button class="btn btn-orange btn-sm" onclick="addBlock()">+ Блок</button><button class="btn btn-success btn-sm" onclick="DB.saveQuestions(DB.questions()).then(()=>showAlert(document.getElementById('qs-msg'),'✅ Вопросы сохранены в облаке','alert-success'))">💾 Сохранить</button></div>
     </div>
     <div id="qs-blocks">${qs.map((b,bi)=>`
     <div class="card card-accent mb-20">
@@ -1336,10 +1482,10 @@ function rdQuestions(p){
 }
 function updateBlockTitle(bi,v){const q=DB.questions();q[bi].title=v;DB.saveQuestions(q);}
 function updateQuestion(bi,qi,v){const q=DB.questions();q[bi].qs[qi].text=v;DB.saveQuestions(q);}
-function deleteQuestion(bi,qi){if(!confirm('Удалить?'))return;const q=DB.questions();q[bi].qs.splice(qi,1);DB.saveQuestions(q);rdQuestions(document.getElementById('admin-content'));}
-function addQuestion(bi){const q=DB.questions();q[bi].qs.push({id:'q'+Date.now(),text:'Новый вопрос'});DB.saveQuestions(q);rdQuestions(document.getElementById('admin-content'));}
-function deleteBlock(bi){if(!confirm('Удалить блок?'))return;const q=DB.questions();q.splice(bi,1);DB.saveQuestions(q);rdQuestions(document.getElementById('admin-content'));}
-function addBlock(){const q=DB.questions();q.push({id:'b'+Date.now(),title:'Новый блок',qs:[{id:'q'+Date.now(),text:'Новый вопрос'}]});DB.saveQuestions(q);rdQuestions(document.getElementById('admin-content'));}
+function deleteQuestion(bi,qi){if(!confirm('Удалить?'))return;const q=DB.questions();q[bi].qs.splice(qi,1);DB.saveQuestions(q).then(()=>rdQuestions(document.getElementById('admin-content')));}
+function addQuestion(bi){const q=DB.questions();q[bi].qs.push({id:'q'+Date.now(),text:'Новый вопрос'});DB.saveQuestions(q).then(()=>rdQuestions(document.getElementById('admin-content')));}
+function deleteBlock(bi){if(!confirm('Удалить блок?'))return;const q=DB.questions();q.splice(bi,1);DB.saveQuestions(q).then(()=>rdQuestions(document.getElementById('admin-content')));}
+function addBlock(){const q=DB.questions();q.push({id:'b'+Date.now(),title:'Новый блок',qs:[{id:'q'+Date.now(),text:'Новый вопрос'}]});DB.saveQuestions(q).then(()=>rdQuestions(document.getElementById('admin-content')));}
 
 // ═══════════════════════════════════════════════════
 // TAB: SETTINGS
@@ -1357,9 +1503,9 @@ function rdSettings(p){
     <div class="card">
       <div class="section-title" style="font-size:15px;color:var(--danger);">⚠ Опасная зона</div>
       <div class="flex gap-8 wrap">
-        <button class="btn btn-danger btn-sm" onclick="if(confirm('Удалить ВСЕ ответы?')){DB.saveResults([]);rdSettings(document.getElementById('admin-content'));}">🗑 Очистить ответы</button>
-        <button class="btn btn-danger btn-sm" onclick="if(confirm('Удалить ВСЕ токены?')){DB.saveTokens([]);rdSettings(document.getElementById('admin-content'));}">🗑 Очистить токены</button>
-        <button class="btn btn-danger btn-sm" onclick="if(confirm('Сбросить вопросы к дефолту?')){DB.saveQuestions(DQ);rdSettings(document.getElementById('admin-content'));}">🔄 Сбросить вопросы</button>
+        <button class="btn btn-danger btn-sm" onclick="if(confirm('Удалить ВСЕ ответы?')){DB.saveResults([]).then(()=>rdSettings(document.getElementById('admin-content')));}">🗑 Очистить ответы</button>
+        <button class="btn btn-danger btn-sm" onclick="if(confirm('Удалить ВСЕ токены?')){DB.saveTokens([]).then(()=>rdSettings(document.getElementById('admin-content')));}">🗑 Очистить токены</button>
+        <button class="btn btn-danger btn-sm" onclick="if(confirm('Сбросить вопросы к дефолту?')){DB.saveQuestions(DQ).then(()=>rdSettings(document.getElementById('admin-content')));}">🔄 Сбросить вопросы</button>
       </div>
     </div>`;
 }
@@ -1367,8 +1513,7 @@ function saveAdminPass(){
   const p1=document.getElementById('np1').value,p2=document.getElementById('np2').value,msg=document.getElementById('settings-msg');
   if(!p1){showAlert(msg,'Введите пароль','alert-warn');return;}
   if(p1!==p2){showAlert(msg,'Пароли не совпадают','alert-danger');return;}
-  const c=DB.settings();c.adminHash=hs(p1);DB.saveSettings(c);
-  showAlert(msg,'✅ Пароль изменён','alert-success');
+  const c=DB.settings();c.adminHash=hs(p1);DB.saveSettings(c).then(()=>showAlert(msg,'✅ Пароль изменён','alert-success'));
   document.getElementById('np1').value='';document.getElementById('np2').value='';
 }
 
@@ -1451,17 +1596,7 @@ document.addEventListener('keydown',e=>{
   else if(scr.id==='screen-admin-login')doAdminLogin();
 });
 
-// One-time cleanup: remove Test_Test, old data and reset settings cache
-(function(){
-  var toks=DB.tokens().filter(function(t){return t.nick!=='Test_Test';});
-  DB.saveTokens(toks);
-  if(!localStorage.getItem('gap_wiped_v2')){
-    DB.saveResults([]);
-    localStorage.removeItem('gap_cfg'); // clear cached admin password
-    localStorage.setItem('gap_wiped_v2','1');
-  }
-})();
-
+// Start app
 boot();
 </script>
 </body>
