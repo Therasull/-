@@ -1145,62 +1145,89 @@ const CA={
 // Smart semantic answer checker
 function checkAnswer(qid, ans){
   const correct=CA[qid];
-  if(!correct)return null; // open question - no etalon
+  if(!correct)return null;
 
-  // Normalize: lowercase, trim
   let a = ans.toLowerCase().trim();
   let c = correct.toLowerCase().trim();
 
-  // ── Transliteration map: russian gaming terms <-> latin equivalents ──
-  const trans = [
-    // Punishment terms
-    [/мьют|мут|mute/g,           'mute'],
-    [/джейл|jail/g,              'jail'],
-    [/бан|ban/g,                 'ban'],
-    [/варн|warn/g,               'warn'],
-    [/пермбан|permban/g,         'permban'],
-    [/абан|aban/g,               'aban'],
-    // Time
-    [/минут|минуты|мин|min/g,'min'],
-    // Logical synonyms
-    [/нет|не может|запрещено|запрещён|нельзя|не разрешено|не допускается/g, 'запрещено'],
-    [/да|может|разрешено|можно|допускается/g, 'да'],
-    [/ничего|ничего не делать|не делать|игнорировать/g, 'ничего'],
-    [/нрп|нон рп|nonrp|non-rp|non rp/g, 'нрп'],
-    [/абан до выяснения|абан на выяснение|заблокировать до выяснения/g, 'абан до выяснения'],
-    // Numbers: words to digits and back
-    [/тридцать|30/g, '30'],
-    [/шестьдесят|60/g, '60'],
-    [/сто двадцать|120/g, '120'],
-    [/сто восемьдесят|180/g, '180'],
-    [/триста|300/g, '300'],
-  ];
+  // Levenshtein distance
+  function lev(a,b){
+    const dp=Array.from({length:a.length+1},(_,i)=>Array.from({length:b.length+1},(_,j)=>j===0?i:0));
+    for(let j=1;j<=b.length;j++)dp[0][j]=j;
+    for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)
+      dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+    return dp[a.length][b.length];
+  }
 
-  function normalize(str){
-    let s = str;
-    trans.forEach(([rx,rep])=>{ s = s.replace(rx, rep); });
-    // Remove punctuation except digits/letters
-    s = s.replace(/[^\wа-яё0-9\s]/gi,' ').replace(/\s+/g,' ').trim();
+  // Synonym/transliteration rules — ORDER MATTERS (specific first)
+  function applyRules(s){
+    // permban — before ban
+    s=s.replace(/permban|перм\s*бан|пермбан|перманентный\s*бан|пермач|вечный\s*бан|пожизненный\s*бан|перм$/g,'permban');
+    // aban до выяснения — before aban
+    s=s.replace(/абан\s*до\s*выяснения|абан\s*на\s*выяснение|временный\s*абан|aban\s*до\s*выяснения/g,'aban до выяснения');
+    // aban — before ban
+    s=s.replace(/\bабан\b|а-бан|адмбан|adminban|admin\s*ban|\bаб\b/g,'aban');
+    // mute
+    s=s.replace(/мьют|мут[её]?|мьте|mute|myut|мьтут|замутить|замут|замьютить|мютнуть/g,'mute');
+    // jail
+    s=s.replace(/джейл+|жейл|жэйл|jail|jeil|jayl|jal|посадить|арест\b|заключение|тюрьма/g,'jail');
+    // ban (after permban/aban)
+    s=s.replace(/\bбан[её]?\b|\bban\b|заблокировать|блокировка|забанить/g,'ban');
+    // warn
+    s=s.replace(/варн|ворн|варнинг|warn|warning|предупреждение|предупр\b/g,'warn');
+    // nrp персонажем
+    s=s.replace(/нрп\s*персонаж|нон\s*рп\s*персонаж|является\s*нрп|админ\s*нрп/g,'нрп персонажем');
+    // nrp
+    s=s.replace(/нрп|нон\s*рп|non\s*rp|non-rp|nonrp|нон-рп/g,'нрп');
+    // да конечно
+    s=s.replace(/да[,.\s]*конечно|конечно[,.\s]*да|обязательно\s*да|да\s*нужно|безусловно|нужно\s*да/g,'да конечно');
+    // ничего
+    s=s.replace(/ничего|ничего\s*не\s*делать|не\s*делать|игнорировать|пройти\s*мимо|не\s*реагировать|никак/g,'ничего');
+    // запрещено (нет)
+    s=s.replace(/нет[,!]?(\s*не\s*может)?|не\s*может|запрещен[оа]?|запрещён|нельзя|не\s*разрешено|не\s*допускается|недопустимо|не\s*имеет\s*право|не\s*вправе/g,'запрещено');
+    // да (можно)
+    s=s.replace(/\bда\b[,!]?(\s*может)?|может\b|разрешено|можно|допускается|позволено|имеет\s*право|вправе/g,'да');
+    // time units
+    s=s.replace(/минут[аы]?|мин\.?\b|min\.?\b|minutes?/g,'min');
+    // numbers
+    s=s.replace(/тридцать|\b30\b/g,'30');
+    s=s.replace(/шестьдесят|\b60\b/g,'60');
+    s=s.replace(/сто\s*двадцать|\b120\b/g,'120');
+    s=s.replace(/сто\s*восемьдесят|\b180\b/g,'180');
+    s=s.replace(/трист[аа]|\b300\b/g,'300');
+    s=s.replace(/\b7\b|семь(?!десят)/g,'7');
+    s=s.replace(/\b15\b|пятнадцать/g,'15');
+    s=s.replace(/\b3\b(?!\d)/g,'3');
+    // slash normalize
+    s=s.replace(/\s*\/\s*/g,' / ');
+    // strip non-alphanumeric (keep slash, space)
+    s=s.replace(/[^a-zа-яё0-9\s\/]/gi,' ').replace(/\s+/g,' ').trim();
     return s;
   }
 
-  const na = normalize(a);
-  const nc = normalize(c);
+  const na = applyRules(a);
+  const nc = applyRules(c);
 
-  // Exact match after normalization
-  if(na === nc) return true;
+  if(na===nc) return true;
 
-  // Check if key semantic tokens all present
   const keywords = nc.split(/\s+/).filter(w=>w.length>1);
-  if(keywords.length === 0) return null;
-  const matched = keywords.filter(w => na.includes(w));
-  const ratio = matched.length / keywords.length;
+  if(!keywords.length) return null;
 
-  // For very short answers (1-2 words), require 100% match
-  if(keywords.length <= 2) return ratio === 1.0;
-  // For longer answers, require 70%
-  return ratio >= 0.7;
+  const matched = keywords.filter(kw=>{
+    if(na.includes(kw)) return true;
+    // fuzzy: check each token in answer
+    return na.split(/\s+/).some(tok=>{
+      const maxDist = kw.length<=4?1:kw.length<=7?2:3;
+      if(Math.abs(tok.length-kw.length)>maxDist+1) return false;
+      return lev(tok,kw)<=maxDist;
+    });
+  });
+
+  const ratio = matched.length/keywords.length;
+  if(keywords.length<=2) return ratio===1.0;
+  return ratio>=0.65;
 }
+
 
 // ═══════════════════════════════════════════════════
 // TAB: DASH
